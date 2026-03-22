@@ -15,9 +15,9 @@ import androidx.compose.ui.unit.sp
 
 val recipesAppTypography = Typography(
     displayLarge = TextStyle(
-        fontFamily = montserratFontFamily,
-        fontWeight = FontWeight.Bold,
-        fontSize = 32.sp,
+        fontFamily = montserratAlternatesFontFamily,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 20.sp,
         lineHeight = 40.sp,
         letterSpacing = 0.sp
     ),
@@ -30,7 +30,7 @@ val recipesAppTypography = Typography(
     ),
     bodyMedium = TextStyle(
         fontFamily = montserratFontFamily,
-        fontWeight = FontWeight.Normal,
+        fontWeight = FontWeight.Medium,
         fontSize = 14.sp,
         lineHeight = 20.sp,
         letterSpacing = 0.25.sp
