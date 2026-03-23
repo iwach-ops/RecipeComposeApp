@@ -10,7 +10,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.sp
 
 val recipesAppTypography = Typography(
@@ -18,21 +19,21 @@ val recipesAppTypography = Typography(
         fontFamily = montserratAlternatesFontFamily,
         fontWeight = FontWeight.SemiBold,
         fontSize = 20.sp,
-        lineHeight = 24.sp,
+        lineHeight = 40.sp,
         letterSpacing = 0.sp
     ),
     titleMedium = TextStyle(
         fontFamily = montserratAlternatesFontFamily,
         fontWeight = FontWeight.SemiBold,
         fontSize = 16.sp,
-        lineHeight = 19.sp,
+        lineHeight = 24.sp,
         letterSpacing = 0.15.sp
     ),
     bodyMedium = TextStyle(
         fontFamily = montserratFontFamily,
         fontWeight = FontWeight.Medium,
         fontSize = 14.sp,
-        lineHeight = 16.sp,
+        lineHeight = 20.sp,
         letterSpacing = 0.25.sp
     ),
     bodySmall = TextStyle(
@@ -45,8 +46,8 @@ val recipesAppTypography = Typography(
     labelLarge = TextStyle(
         fontFamily = montserratAlternatesFontFamily,
         fontWeight = FontWeight.SemiBold,
-        fontSize = 16.sp,
-        lineHeight = 19.5.sp,
+        fontSize = 14.sp,
+        lineHeight = 20.sp,
         letterSpacing = 0.1.sp
     )
 )
@@ -56,8 +57,10 @@ val recipesAppTypography = Typography(
 fun TypographyPreview() {
     RecipesAppTheme {
         Column(
-            modifier = androidx.compose.ui.Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            modifier = Modifier
+                .statusBarsPadding()
+                .padding(Dimens.Space16),
+            verticalArrangement = Arrangement.spacedBy(Dimens.Space8)
         ) {
             Text(
                 "displayLarge - Заголовки экранов",
