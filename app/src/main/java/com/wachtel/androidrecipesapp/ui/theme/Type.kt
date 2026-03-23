@@ -18,21 +18,21 @@ val recipesAppTypography = Typography(
         fontFamily = montserratAlternatesFontFamily,
         fontWeight = FontWeight.SemiBold,
         fontSize = 20.sp,
-        lineHeight = 40.sp,
+        lineHeight = 24.sp,
         letterSpacing = 0.sp
     ),
     titleMedium = TextStyle(
-        fontFamily = montserratFontFamily,
+        fontFamily = montserratAlternatesFontFamily,
         fontWeight = FontWeight.SemiBold,
         fontSize = 16.sp,
-        lineHeight = 24.sp,
+        lineHeight = 19.sp,
         letterSpacing = 0.15.sp
     ),
     bodyMedium = TextStyle(
         fontFamily = montserratFontFamily,
         fontWeight = FontWeight.Medium,
         fontSize = 14.sp,
-        lineHeight = 20.sp,
+        lineHeight = 16.sp,
         letterSpacing = 0.25.sp
     ),
     bodySmall = TextStyle(
@@ -45,8 +45,8 @@ val recipesAppTypography = Typography(
     labelLarge = TextStyle(
         fontFamily = montserratAlternatesFontFamily,
         fontWeight = FontWeight.SemiBold,
-        fontSize = 14.sp,
-        lineHeight = 20.sp,
+        fontSize = 16.sp,
+        lineHeight = 19.5.sp,
         letterSpacing = 0.1.sp
     )
 )
