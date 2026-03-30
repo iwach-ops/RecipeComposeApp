@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.wachtel.androidrecipesapp.core.ui.navigation.BottomNavigation
+import com.wachtel.androidrecipesapp.ui.categories.CategoriesScreen
 import com.wachtel.androidrecipesapp.ui.theme.RecipesAppTheme
 
 @Composable
@@ -39,18 +40,11 @@ fun RecipesApp() {
         ) { paddingValues ->
             when (currentScreen) {
                 ScreenId.CATEGORIES -> {
-                    Box(
+                    CategoriesScreen(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(paddingValues),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "Категории",
-                            color = MaterialTheme.colorScheme.tertiary,
-                            style = MaterialTheme.typography.displayLarge
-                        )
-                    }
+                            .padding(paddingValues)
+                    )
                 }
 
                 ScreenId.FAVORITES -> {
