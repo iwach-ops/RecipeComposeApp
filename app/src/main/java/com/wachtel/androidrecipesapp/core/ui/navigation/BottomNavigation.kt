@@ -2,12 +2,10 @@ package com.wachtel.androidrecipesapp.core.ui.navigation
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -20,6 +18,7 @@ import com.wachtel.androidrecipesapp.ui.theme.Dimens
 @Composable
 fun BottomNavigation(
     onCategoriesClick: () -> Unit,
+    onRecipesClick: () -> Unit,
     onFavoriteClick: () -> Unit
 ) {
     Row(
@@ -27,7 +26,7 @@ fun BottomNavigation(
             .fillMaxWidth()
             .navigationBarsPadding()
             .padding(horizontal = Dimens.Space16, vertical = Dimens.Space12),
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.spacedBy(Dimens.Space12)
     ) {
         Button(
             onClick = onCategoriesClick,
@@ -42,11 +41,26 @@ fun BottomNavigation(
         ) {
             Text(
                 text = "Категории",
-                style = MaterialTheme.typography.labelLarge
+                style = MaterialTheme.typography.bodySmall
             )
         }
 
-        Spacer(modifier = Modifier.width(Dimens.Space12))
+        Button(
+            onClick = onRecipesClick,
+            modifier = Modifier
+                .weight(1f)
+                .height(Dimens.ButtonHeight),
+            shape = RoundedCornerShape(Dimens.CornerLarge),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            )
+        ) {
+            Text(
+                text = "Рецепты",
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
 
         Button(
             onClick = onFavoriteClick,
@@ -61,7 +75,7 @@ fun BottomNavigation(
         ) {
             Text(
                 text = "Избранное",
-                style = MaterialTheme.typography.labelLarge
+                style = MaterialTheme.typography.bodySmall
             )
         }
     }
