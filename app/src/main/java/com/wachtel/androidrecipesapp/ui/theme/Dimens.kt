@@ -18,6 +18,7 @@ object Dimens {
     val SearchBarHeight = 56.dp
     val CategorySectionHeight = 120.dp
     val RecipeCardHeight = 220.dp
+    val HeaderHeight = 220.dp
 
     val CardElevation = 4.dp
     val ButtonElevation = 6.dp
