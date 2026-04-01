@@ -1,21 +1,20 @@
 package com.wachtel.androidrecipesapp
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.wachtel.androidrecipesapp.core.ui.navigation.BottomNavigation
 import com.wachtel.androidrecipesapp.ui.categories.CategoriesScreen
+import com.wachtel.androidrecipesapp.ui.favorites.FavoritesScreen
+import com.wachtel.androidrecipesapp.ui.recipes.RecipesScreen
 import com.wachtel.androidrecipesapp.ui.theme.RecipesAppTheme
 
 @Composable
@@ -32,6 +31,9 @@ fun RecipesApp() {
                     onCategoriesClick = {
                         currentScreen = ScreenId.CATEGORIES
                     },
+                    onRecipesClick = {
+                        currentScreen = ScreenId.RECIPES
+                    },
                     onFavoriteClick = {
                         currentScreen = ScreenId.FAVORITES
                     }
@@ -47,19 +49,20 @@ fun RecipesApp() {
                     )
                 }
 
-                ScreenId.FAVORITES -> {
-                    Box(
+                ScreenId.RECIPES -> {
+                    RecipesScreen(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(paddingValues),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "Избранное",
-                            color = MaterialTheme.colorScheme.error,
-                            style = MaterialTheme.typography.displayLarge
-                        )
-                    }
+                            .padding(paddingValues)
+                    )
+                }
+
+                ScreenId.FAVORITES -> {
+                    FavoritesScreen(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues)
+                    )
                 }
             }
         }

@@ -1,4 +1,4 @@
-package com.wachtel.androidrecipesapp.ui.categories
+package com.wachtel.androidrecipesapp.ui.recipes
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,26 +13,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.wachtel.androidrecipesapp.R
 import com.wachtel.androidrecipesapp.core.ui.ScreenHeader
 import com.wachtel.androidrecipesapp.ui.theme.Dimens
 import com.wachtel.androidrecipesapp.ui.theme.RecipesAppTheme
 
 @Composable
-fun CategoriesScreen(
-    modifier: Modifier = Modifier,
-    //imagePainter: Painter = ColorPainter(Color(0xFFD8C4F8))
+fun RecipesScreen(
+    modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier.fillMaxSize()
     ) {
         ScreenHeader(
-            imagePainter = painterResource(id = R.drawable.bcg_categories),
-            contentDescription = "Категории",
-            title = "Категории"
+            imagePainter = ColorPainter(Color(0xFFDCE8FF)),
+            contentDescription = "Рецепты",
+            title = "Рецепты"
         )
 
         Box(
@@ -43,11 +39,10 @@ fun CategoriesScreen(
         ) {
             Surface(
                 shape = RoundedCornerShape(Dimens.CornerExtraLarge),
-                tonalElevation = Dimens.CardElevation,
-                color = MaterialTheme.colorScheme.surface.copy(alpha = 0.92f)
+                tonalElevation = Dimens.CardElevation
             ) {
                 Text(
-                    text = "Здесь скоро появится список категорий",
+                    text = "Скоро здесь будет список рецептов",
                     modifier = Modifier.padding(
                         horizontal = Dimens.Space20,
                         vertical = Dimens.Space24
@@ -62,8 +57,8 @@ fun CategoriesScreen(
 
 @Preview(showBackground = true)
 @Composable
-private fun CategoriesScreenPreview() {
+private fun RecipesScreenPreview() {
     RecipesAppTheme {
-        CategoriesScreen()
+        RecipesScreen()
     }
 }
