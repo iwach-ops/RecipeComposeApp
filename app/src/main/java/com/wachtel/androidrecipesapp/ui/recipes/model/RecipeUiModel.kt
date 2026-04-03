@@ -1,0 +1,30 @@
+package com.wachtel.androidrecipesapp.ui.recipes.model
+
+import androidx.compose.runtime.Immutable
+import com.wachtel.androidrecipesapp.core.ASSETS_URI_PREFIX
+import com.wachtel.androidrecipesapp.data.model.RecipeDto
+
+@Immutable
+data class RecipeUiModel(
+    val id: Int,
+    val title: String,
+    val imageUrl: String,
+    val ingredients: List<IngredientUiModel>,
+    val method: List<String>,
+    val isFavorite: Boolean
+)
+
+fun RecipeDto.toUiModel(): RecipeUiModel {
+    return RecipeUiModel(
+        id = id,
+        title = title,
+        imageUrl = if (imageUrl.startsWith("http", ignoreCase = true)) {
+            imageUrl
+        } else {
+            ASSETS_URI_PREFIX + imageUrl
+        },
+        ingredients = ingredients.map { it.toUiModel() },
+        method = method,
+        isFavorite = false
+    )
+}
