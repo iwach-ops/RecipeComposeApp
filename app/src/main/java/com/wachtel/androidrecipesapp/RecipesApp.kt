@@ -45,7 +45,10 @@ fun RecipesApp() {
                     CategoriesScreen(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(paddingValues)
+                            .padding(paddingValues),
+                        onCategoryClick = { categoryId ->
+                            currentScreen = ScreenId.RECIPES
+                        }
                     )
                 }
 
