@@ -151,6 +151,57 @@ object RecipesRepositoryStub {
         )
     )
 
+    private val dessertRecipes = listOf(
+        RecipeDto(
+            id = 100,
+            title = "Шоколадный мусс",
+            ingredients = listOf(
+                IngredientDto("200", "г", "темный шоколад"),
+                IngredientDto("300", "мл", "сливки")
+            ),
+            method = listOf(
+                "1. Растопите шоколад.",
+                "2. Смешайте со сливками.",
+                "3. Охладите перед подачей."
+            ),
+            imageUrl = "dessert-mousse.png"
+        )
+    )
+
+    private val pizzaRecipes = listOf(
+        RecipeDto(
+            id = 200,
+            title = "Маргарита",
+            ingredients = listOf(
+                IngredientDto("1", "шт", "основа для пиццы"),
+                IngredientDto("150", "г", "моцарелла")
+            ),
+            method = listOf(
+                "1. Подготовьте основу.",
+                "2. Добавьте начинку.",
+                "3. Выпекайте до готовности."
+            ),
+            imageUrl = "pizza-margherita.png"
+        )
+    )
+
+    private val soupRecipes = listOf(
+        RecipeDto(
+            id = 300,
+            title = "Томатный суп",
+            ingredients = listOf(
+                IngredientDto("500", "г", "помидоры"),
+                IngredientDto("1", "шт", "лук")
+            ),
+            method = listOf(
+                "1. Подготовьте овощи.",
+                "2. Варите до готовности.",
+                "3. Измельчите и подавайте."
+            ),
+            imageUrl = "soup-tomato.png"
+        )
+    )
+
     fun getCategories(): List<CategoryDto> {
         return categories
     }
@@ -158,6 +209,9 @@ object RecipesRepositoryStub {
     fun getRecipesByCategoryId(categoryId: Int): List<RecipeDto> {
         return when (categoryId) {
             0 -> burgerRecipes
+            1 -> dessertRecipes
+            2 -> pizzaRecipes
+            4 -> soupRecipes
             else -> emptyList()
         }
     }
