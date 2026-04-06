@@ -202,6 +202,42 @@ object RecipesRepositoryStub {
         )
     )
 
+    private val fishRecipes = listOf(
+        RecipeDto(
+            id = 400,
+            title = "Запеченная рыба с лимоном",
+            ingredients = listOf(
+                IngredientDto("1", "шт", "рыба"),
+                IngredientDto("1", "шт", "лимон"),
+                IngredientDto("2", "ст. л.", "оливковое масло")
+            ),
+            method = listOf(
+                "1. Очистите и подготовьте рыбу.",
+                "2. Добавьте лимон и масло.",
+                "3. Запекайте до готовности."
+            ),
+            imageUrl = "fish.png"
+        )
+    )
+
+    private val saladRecipes = listOf(
+        RecipeDto(
+            id = 500,
+            title = "Греческий салат",
+            ingredients = listOf(
+                IngredientDto("2", "шт", "помидоры"),
+                IngredientDto("1", "шт", "огурец"),
+                IngredientDto("150", "г", "сыр фета")
+            ),
+            method = listOf(
+                "1. Нарежьте овощи.",
+                "2. Добавьте сыр.",
+                "3. Перемешайте и подавайте."
+            ),
+            imageUrl = "salad.png"
+        )
+    )
+
     fun getCategories(): List<CategoryDto> {
         return categories
     }
@@ -211,7 +247,9 @@ object RecipesRepositoryStub {
             0 -> burgerRecipes
             1 -> dessertRecipes
             2 -> pizzaRecipes
+            3 -> fishRecipes
             4 -> soupRecipes
+            5 -> saladRecipes
             else -> emptyList()
         }
     }

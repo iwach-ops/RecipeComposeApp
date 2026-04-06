@@ -24,6 +24,14 @@ fun RecipesApp() {
             mutableStateOf(ScreenId.CATEGORIES)
         }
 
+        var selectedCategoryId by remember {
+            mutableStateOf(-1)
+        }
+
+        var selectedCategoryTitle by remember {
+            mutableStateOf("Рецепты")
+        }
+
         Scaffold(
             containerColor = MaterialTheme.colorScheme.background,
             bottomBar = {
@@ -46,7 +54,9 @@ fun RecipesApp() {
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(paddingValues),
-                        onCategoryClick = { categoryId ->
+                        onCategoryClick = { categoryId, categoryTitle ->
+                            selectedCategoryId = categoryId
+                            selectedCategoryTitle = categoryTitle
                             currentScreen = ScreenId.RECIPES
                         }
                     )
@@ -54,6 +64,8 @@ fun RecipesApp() {
 
                 ScreenId.RECIPES -> {
                     RecipesScreen(
+                        categoryId = selectedCategoryId,
+                        categoryTitle = selectedCategoryTitle,
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(paddingValues)
