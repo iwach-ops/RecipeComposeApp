@@ -1,31 +1,34 @@
 package com.wachtel.androidrecipesapp.ui.categories
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.ColorPainter
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.wachtel.androidrecipesapp.R
 import com.wachtel.androidrecipesapp.core.ui.ScreenHeader
+import com.wachtel.androidrecipesapp.data.repository.RecipesRepositoryStub
+import com.wachtel.androidrecipesapp.ui.categories.model.toUiModel
 import com.wachtel.androidrecipesapp.ui.theme.Dimens
 import com.wachtel.androidrecipesapp.ui.theme.RecipesAppTheme
 
 @Composable
 fun CategoriesScreen(
     modifier: Modifier = Modifier,
-    //imagePainter: Painter = ColorPainter(Color(0xFFD8C4F8))
+    onCategoryClick: (Int) -> Unit
 ) {
+    val categories = remember {
+        RecipesRepositoryStub.getCategories().map { it.toUiModel() }
+    }
+
     Column(
         modifier = modifier.fillMaxSize()
     ) {
@@ -35,25 +38,22 @@ fun CategoriesScreen(
             title = "Категории"
         )
 
-        Box(
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
             modifier = Modifier
-                .fillMaxSize()
-                .padding(Dimens.Space16),
-            contentAlignment = Alignment.Center
+                .fillMaxWidth()
+                .weight(1f),
+            contentPadding = PaddingValues(Dimens.Space16),
+            horizontalArrangement = Arrangement.spacedBy(Dimens.Space12),
+            verticalArrangement = Arrangement.spacedBy(Dimens.Space12)
         ) {
-            Surface(
-                shape = RoundedCornerShape(Dimens.CornerExtraLarge),
-                tonalElevation = Dimens.CardElevation,
-                color = MaterialTheme.colorScheme.surface.copy(alpha = 0.92f)
-            ) {
-                Text(
-                    text = "Здесь скоро появится список категорий",
-                    modifier = Modifier.padding(
-                        horizontal = Dimens.Space20,
-                        vertical = Dimens.Space24
-                    ),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+            items(
+                items = categories,
+                key = { it.id }
+            ) { category ->
+                CategoryItem(
+                    category = category,
+                    onClick = { onCategoryClick(category.id) }
                 )
             }
         }
@@ -64,6 +64,8 @@ fun CategoriesScreen(
 @Composable
 private fun CategoriesScreenPreview() {
     RecipesAppTheme {
-        CategoriesScreen()
+        CategoriesScreen(
+            onCategoryClick = {}
+        )
     }
 }
