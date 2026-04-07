@@ -20,6 +20,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import coil.compose.AsyncImage
 import com.wachtel.androidrecipesapp.ui.categories.model.CategoryUiModel
 import com.wachtel.androidrecipesapp.ui.theme.Dimens
+import androidx.compose.runtime.remember
 
 @Composable
 fun CategoryItem(
@@ -27,7 +28,10 @@ fun CategoryItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val fallbackPainter = ColorPainter(MaterialTheme.colorScheme.surfaceVariant)
+    val surfaceVariant = MaterialTheme.colorScheme.surfaceVariant
+    val fallbackPainter = remember(surfaceVariant) {
+        ColorPainter(surfaceVariant)
+    }
 
     Card(
         modifier = modifier
