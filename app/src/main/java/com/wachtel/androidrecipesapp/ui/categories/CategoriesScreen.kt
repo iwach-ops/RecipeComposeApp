@@ -23,7 +23,7 @@ import com.wachtel.androidrecipesapp.ui.theme.RecipesAppTheme
 @Composable
 fun CategoriesScreen(
     modifier: Modifier = Modifier,
-    onCategoryClick: (Int) -> Unit
+    onCategoryClick: (Int, String) -> Unit
 ) {
     val categories = remember {
         RecipesRepositoryStub.getCategories().map { it.toUiModel() }
@@ -53,7 +53,7 @@ fun CategoriesScreen(
             ) { category ->
                 CategoryItem(
                     category = category,
-                    onClick = { onCategoryClick(category.id) }
+                    onClick = { onCategoryClick(category.id, category.title) }
                 )
             }
         }
@@ -65,7 +65,7 @@ fun CategoriesScreen(
 private fun CategoriesScreenPreview() {
     RecipesAppTheme {
         CategoriesScreen(
-            onCategoryClick = {}
+            onCategoryClick = { _, _ -> }
         )
     }
 }
