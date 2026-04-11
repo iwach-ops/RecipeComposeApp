@@ -25,7 +25,7 @@ import com.wachtel.androidrecipesapp.ui.theme.Dimens
 @Composable
 fun RecipeItem(
     recipe: RecipeUiModel,
-    onClick: (Int) -> Unit,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val surfaceVariant = MaterialTheme.colorScheme.surfaceVariant
@@ -36,7 +36,7 @@ fun RecipeItem(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .clickable { onClick(recipe.id) },
+            .clickable { onClick() },
         shape = RoundedCornerShape(Dimens.CornerLarge),
         elevation = CardDefaults.cardElevation(
             defaultElevation = Dimens.CardElevation

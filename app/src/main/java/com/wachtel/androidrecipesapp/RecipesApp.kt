@@ -1,5 +1,8 @@
 package com.wachtel.androidrecipesapp
 
+import com.wachtel.androidrecipesapp.ui.recipes.model.RecipeUiModel
+import com.wachtel.androidrecipesapp.core.KEY_RECIPE_OBJECT
+import com.wachtel.androidrecipesapp.ui.details.RecipeDetailsScreen
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
@@ -103,9 +106,14 @@ fun RecipesApp() {
                         categoryId = categoryId,
                         categoryTitle = categoryTitle,
                         modifier = Modifier.fillMaxSize(),
-                        onRecipeClick = { recipeId ->
-                            // Hier später Detailscreen einbauen:
-                            // navController.navigate(...)
+                        onRecipeClick = { recipeId, recipe ->
+                            navController.currentBackStackEntry
+                                ?.savedStateHandle
+                                ?.set(KEY_RECIPE_OBJECT, recipe)
+
+                            navController.navigate(
+                                Destination.RecipeDetails.createRoute(recipeId)
+                            )
                         }
                     )
                 }
@@ -121,6 +129,23 @@ fun RecipesApp() {
                     FavoritesScreen(
                         modifier = Modifier.fillMaxSize()
                     )
+                }
+
+                composable(
+                    route = Destination.RecipeDetails.route,
+                    arguments = listOf(
+                        navArgument("recipeId") {
+                            type = NavType.IntType
+                        }
+                    )
+                ) {
+                    val recipe = navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.get<RecipeUiModel>(KEY_RECIPE_OBJECT)
+
+                    if (recipe != null) {
+                        RecipeDetailsScreen(recipe = recipe)
+                    }
                 }
             }
         }
