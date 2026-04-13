@@ -50,51 +50,15 @@ object RecipesRepositoryStub {
             id = 0,
             title = "Классический бургер с говядиной",
             ingredients = listOf(
-                IngredientDto(
-                    quantity = "0.5",
-                    unitOfMeasure = "кг",
-                    description = "говяжий фарш"
-                ),
-                IngredientDto(
-                    quantity = "1.0",
-                    unitOfMeasure = "шт",
-                    description = "луковица, мелко нарезанная"
-                ),
-                IngredientDto(
-                    quantity = "2.0",
-                    unitOfMeasure = "зубч",
-                    description = "чеснок, измельченный"
-                ),
-                IngredientDto(
-                    quantity = "4.0",
-                    unitOfMeasure = "шт",
-                    description = "булочки для бургера"
-                ),
-                IngredientDto(
-                    quantity = "4.0",
-                    unitOfMeasure = "шт",
-                    description = "листа салата"
-                ),
-                IngredientDto(
-                    quantity = "1.0",
-                    unitOfMeasure = "шт",
-                    description = "помидор, нарезанный кольцами"
-                ),
-                IngredientDto(
-                    quantity = "2.0",
-                    unitOfMeasure = "ст. л.",
-                    description = "горчица"
-                ),
-                IngredientDto(
-                    quantity = "2.0",
-                    unitOfMeasure = "ст. л.",
-                    description = "кетчуп"
-                ),
-                IngredientDto(
-                    quantity = "по вкусу",
-                    unitOfMeasure = "",
-                    description = "соль и черный перец"
-                )
+                IngredientDto("0.5", "кг", "говяжий фарш"),
+                IngredientDto("1.0", "шт", "луковица, мелко нарезанная"),
+                IngredientDto("2.0", "зубч", "чеснок, измельченный"),
+                IngredientDto("4.0", "шт", "булочки для бургера"),
+                IngredientDto("4.0", "шт", "листа салата"),
+                IngredientDto("1.0", "шт", "помидор, нарезанный кольцами"),
+                IngredientDto("2.0", "ст. л.", "горчица"),
+                IngredientDto("2.0", "ст. л.", "кетчуп"),
+                IngredientDto("по вкусу", "", "соль и черный перец")
             ),
             method = listOf(
                 "1. В глубокой миске смешайте говяжий фарш, лук, чеснок, соль и перец. Разделите фарш на 4 равные части и сформируйте котлеты.",
@@ -109,36 +73,12 @@ object RecipesRepositoryStub {
             id = 1,
             title = "Чизбургер с беконом",
             ingredients = listOf(
-                IngredientDto(
-                    quantity = "0.4",
-                    unitOfMeasure = "кг",
-                    description = "говяжий фарш"
-                ),
-                IngredientDto(
-                    quantity = "4.0",
-                    unitOfMeasure = "шт",
-                    description = "ломтика бекона"
-                ),
-                IngredientDto(
-                    quantity = "4.0",
-                    unitOfMeasure = "шт",
-                    description = "ломтика сыра чеддер"
-                ),
-                IngredientDto(
-                    quantity = "4.0",
-                    unitOfMeasure = "шт",
-                    description = "булочки для бургера"
-                ),
-                IngredientDto(
-                    quantity = "1.0",
-                    unitOfMeasure = "шт",
-                    description = "помидор, нарезанный"
-                ),
-                IngredientDto(
-                    quantity = "по вкусу",
-                    unitOfMeasure = "",
-                    description = "майонез и кетчуп"
-                )
+                IngredientDto("0.4", "кг", "говяжий фарш"),
+                IngredientDto("4.0", "шт", "ломтика бекона"),
+                IngredientDto("4.0", "шт", "ломтика сыра чеддер"),
+                IngredientDto("4.0", "шт", "булочки для бургера"),
+                IngredientDto("1.0", "шт", "помидор, нарезанный"),
+                IngredientDto("по вкусу", "", "майонез и кетчуп")
             ),
             method = listOf(
                 "1. Обжарьте бекон на сковороде до хрустящей корочки, отложите на бумажное полотенце.",
@@ -238,6 +178,15 @@ object RecipesRepositoryStub {
         )
     )
 
+    private val allRecipes by lazy {
+        burgerRecipes +
+                dessertRecipes +
+                pizzaRecipes +
+                fishRecipes +
+                soupRecipes +
+                saladRecipes
+    }
+
     fun getCategories(): List<CategoryDto> {
         return categories
     }
@@ -252,5 +201,9 @@ object RecipesRepositoryStub {
             5 -> saladRecipes
             else -> emptyList()
         }
+    }
+
+    fun getRecipeById(recipeId: Int): RecipeDto? {
+        return allRecipes.find { it.id == recipeId }
     }
 }

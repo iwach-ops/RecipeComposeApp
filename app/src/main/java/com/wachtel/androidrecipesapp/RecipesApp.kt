@@ -1,8 +1,5 @@
 package com.wachtel.androidrecipesapp
 
-import com.wachtel.androidrecipesapp.ui.recipes.model.RecipeUiModel
-import com.wachtel.androidrecipesapp.core.KEY_RECIPE_OBJECT
-import com.wachtel.androidrecipesapp.ui.details.RecipeDetailsScreen
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
@@ -21,6 +18,7 @@ import androidx.navigation.navDeepLink
 import com.wachtel.androidrecipesapp.core.ui.navigation.BottomNavigation
 import com.wachtel.androidrecipesapp.core.ui.navigation.Destination
 import com.wachtel.androidrecipesapp.ui.categories.CategoriesScreen
+import com.wachtel.androidrecipesapp.ui.details.RecipeDetailsScreen
 import com.wachtel.androidrecipesapp.ui.favorites.FavoritesScreen
 import com.wachtel.androidrecipesapp.ui.recipes.RecipesScreen
 import com.wachtel.androidrecipesapp.ui.theme.RecipesAppTheme
@@ -106,11 +104,7 @@ fun RecipesApp() {
                         categoryId = categoryId,
                         categoryTitle = categoryTitle,
                         modifier = Modifier.fillMaxSize(),
-                        onRecipeClick = { recipeId, recipe ->
-                            navController.currentBackStackEntry
-                                ?.savedStateHandle
-                                ?.set(KEY_RECIPE_OBJECT, recipe)
-
+                        onRecipeClick = { recipeId ->
                             navController.navigate(
                                 Destination.RecipeDetails.createRoute(recipeId)
                             )
@@ -134,18 +128,24 @@ fun RecipesApp() {
                 composable(
                     route = Destination.RecipeDetails.route,
                     arguments = listOf(
-                        navArgument("recipeId") {
+                        navArgument(Destination.RecipeDetails.recipeIdArg) {
                             type = NavType.IntType
                         }
+                    ),
+                    deepLinks = listOf(
+                        navDeepLink {
+                            uriPattern = Destination.RecipeDetails.deepLinkPattern
+                        }
                     )
-                ) {
-                    val recipe = navController.previousBackStackEntry
-                        ?.savedStateHandle
-                        ?.get<RecipeUiModel>(KEY_RECIPE_OBJECT)
+                ) { backStackEntry ->
+                    val recipeId = backStackEntry.arguments
+                        ?.getInt(Destination.RecipeDetails.recipeIdArg)
+                        ?: return@composable
 
-                    if (recipe != null) {
-                        RecipeDetailsScreen(recipe = recipe)
-                    }
+                    RecipeDetailsScreen(
+                        recipeId = recipeId,
+                        modifier = Modifier.fillMaxSize()
+                    )
                 }
             }
         }
