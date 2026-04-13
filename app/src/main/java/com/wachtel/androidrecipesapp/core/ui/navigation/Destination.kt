@@ -45,4 +45,11 @@ sealed class Destination(
                     "$categoryTitleArg=${Uri.encode(categoryTitle)}"
         }
     }
+
+    data object RecipeDetails : Destination(
+        route = "recipe/{recipeId}",
+        deepLinkPattern = "androidrecipes://recipe/{recipeId}"
+    ) {
+        fun createRoute(recipeId: Int): String = "recipe/$recipeId"
+    }
 }

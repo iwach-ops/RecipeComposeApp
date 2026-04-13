@@ -36,7 +36,7 @@ fun RecipesScreen(
     categoryId: Int,
     categoryTitle: String,
     modifier: Modifier = Modifier,
-    onRecipeClick: (Int) -> Unit = {}
+    onRecipeClick: (Int, RecipeUiModel) -> Unit
 ) {
     var recipes by remember {
         mutableStateOf<List<RecipeUiModel>>(emptyList())
@@ -93,7 +93,9 @@ fun RecipesScreen(
                 ) { recipe ->
                     RecipeItem(
                         recipe = recipe,
-                        onClick = onRecipeClick
+                        onClick = {
+                            onRecipeClick(recipe.id, recipe)
+                        }
                     )
                 }
             }
@@ -107,7 +109,8 @@ private fun RecipesScreenPreview() {
     RecipesAppTheme {
         RecipesScreen(
             categoryId = 0,
-            categoryTitle = "Бургеры"
+            categoryTitle = "Бургеры",
+            onRecipeClick = { _, _ -> }
         )
     }
 }
