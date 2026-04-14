@@ -50,6 +50,7 @@ sealed class Destination(
         route = "recipe/{recipeId}",
         deepLinkPattern = "androidrecipes://recipe/{recipeId}"
     ) {
+        const val recipeIdArg = "recipeId"
         fun createRoute(recipeId: Int): String = "recipe/$recipeId"
     }
 }
