@@ -5,6 +5,10 @@ import android.net.Uri
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -134,9 +138,17 @@ fun AppNavHost(
                 .getRecipeById(recipeId)
                 ?.toUiModel()
 
+            var isFavorite by rememberSaveable(recipeId) {
+                mutableStateOf(false)
+            }
+
             if (recipe != null) {
                 RecipeDetailsScreen(
                     recipe = recipe,
+                    isFavorite = isFavorite,
+                    onFavoriteToggle = {
+                        isFavorite = !isFavorite
+                    },
                     modifier = Modifier.fillMaxSize()
                 )
             } else {
