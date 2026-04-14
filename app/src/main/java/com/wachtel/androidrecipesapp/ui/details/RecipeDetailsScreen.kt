@@ -18,49 +18,22 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import coil.compose.rememberAsyncImagePainter
+import com.wachtel.androidrecipesapp.core.shareRecipe
 import com.wachtel.androidrecipesapp.core.ui.ScreenHeader
-import com.wachtel.androidrecipesapp.data.repository.RecipesRepositoryStub
-import com.wachtel.androidrecipesapp.ui.recipes.model.toUiModel
+import com.wachtel.androidrecipesapp.ui.recipes.model.RecipeUiModel
 import com.wachtel.androidrecipesapp.ui.theme.Dimens
 
 @Composable
 fun RecipeDetailsScreen(
-    recipeId: Int,
+    recipe: RecipeUiModel,
     modifier: Modifier = Modifier
 ) {
-    val recipe = remember(recipeId) {
-        RecipesRepositoryStub.getRecipeById(recipeId)?.toUiModel()
-    }
-
-    if (recipe == null) {
-        Box(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(Dimens.Space16),
-            contentAlignment = Alignment.Center
-        ) {
-            Surface(
-                shape = RoundedCornerShape(Dimens.CornerExtraLarge),
-                tonalElevation = Dimens.CardElevation
-            ) {
-                Text(
-                    text = "Рецепт не найден",
-                    modifier = Modifier.padding(
-                        horizontal = Dimens.Space20,
-                        vertical = Dimens.Space24
-                    ),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        }
-        return
-    }
+    val context = LocalContext.current
 
     Column(
         modifier = modifier
@@ -70,7 +43,15 @@ fun RecipeDetailsScreen(
         ScreenHeader(
             imagePainter = rememberAsyncImagePainter(model = recipe.imageUrl),
             contentDescription = recipe.title,
-            title = recipe.title
+            title = recipe.title,
+            showShareButton = true,
+            onShareClick = {
+                shareRecipe(
+                    context = context,
+                    recipeId = recipe.id,
+                    recipeTitle = recipe.title
+                )
+            }
         )
 
         Column(
@@ -132,6 +113,33 @@ fun RecipeDetailsScreen(
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun RecipeNotFoundScreen(
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(Dimens.Space16),
+        contentAlignment = Alignment.Center
+    ) {
+        Surface(
+            shape = RoundedCornerShape(Dimens.CornerExtraLarge),
+            tonalElevation = Dimens.CardElevation
+        ) {
+            Text(
+                text = "Рецепт не найден",
+                modifier = Modifier.padding(
+                    horizontal = Dimens.Space20,
+                    vertical = Dimens.Space24
+                ),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }
