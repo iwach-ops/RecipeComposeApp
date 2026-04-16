@@ -1,6 +1,7 @@
 package com.wachtel.androidrecipesapp.core.ui
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,7 +27,9 @@ fun ScreenHeader(
     imagePainter: Painter,
     contentDescription: String,
     title: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    showShareButton: Boolean = false,
+    onShareClick: () -> Unit = {}
 ) {
     Box(
         modifier = modifier
@@ -39,6 +42,31 @@ fun ScreenHeader(
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
+
+        if (showShareButton) {
+            Surface(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(
+                        top = Dimens.Space16,
+                        end = Dimens.Space16
+                    )
+                    .clickable(onClick = onShareClick),
+                shape = RoundedCornerShape(Dimens.CornerLarge),
+                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.92f),
+                tonalElevation = Dimens.CardElevation
+            ) {
+                Text(
+                    text = "Поделиться",
+                    modifier = Modifier.padding(
+                        horizontal = Dimens.Space16,
+                        vertical = Dimens.Space12
+                    ),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+            }
+        }
 
         Surface(
             modifier = Modifier
@@ -71,7 +99,8 @@ private fun ScreenHeaderPreview() {
         ScreenHeader(
             imagePainter = ColorPainter(Color(0xFFD8C4F8)),
             contentDescription = "Preview header",
-            title = "Категории"
+            title = "Категории",
+            showShareButton = true
         )
     }
 }

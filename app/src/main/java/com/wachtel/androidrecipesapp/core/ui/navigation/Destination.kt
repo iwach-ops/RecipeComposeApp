@@ -1,6 +1,10 @@
 package com.wachtel.androidrecipesapp.core.ui.navigation
 
 import android.net.Uri
+import com.wachtel.androidrecipesapp.core.PARAM_RECIPE_ID
+import com.wachtel.androidrecipesapp.core.RECIPE_CUSTOM_HOST
+import com.wachtel.androidrecipesapp.core.RECIPE_CUSTOM_SCHEME
+import com.wachtel.androidrecipesapp.core.RECIPE_ROUTE
 
 sealed class Destination(
     val route: String,
@@ -47,10 +51,13 @@ sealed class Destination(
     }
 
     data object RecipeDetails : Destination(
-        route = "recipe/{recipeId}",
-        deepLinkPattern = "androidrecipes://recipe/{recipeId}"
+        route = RECIPE_ROUTE,
+        deepLinkPattern = "$RECIPE_CUSTOM_SCHEME://$RECIPE_CUSTOM_HOST/{$PARAM_RECIPE_ID}"
     ) {
-        const val recipeIdArg = "recipeId"
-        fun createRoute(recipeId: Int): String = "recipe/$recipeId"
+        const val recipeIdArg = PARAM_RECIPE_ID
+
+        fun createRoute(recipeId: Int): String {
+            return "recipe/$recipeId"
+        }
     }
 }
