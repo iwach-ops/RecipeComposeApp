@@ -23,6 +23,7 @@ import com.wachtel.androidrecipesapp.ui.details.RecipeNotFoundScreen
 import com.wachtel.androidrecipesapp.ui.favorites.FavoritesScreen
 import com.wachtel.androidrecipesapp.ui.recipes.RecipesScreen
 import com.wachtel.androidrecipesapp.ui.recipes.model.toUiModel
+import kotlinx.coroutines.delay
 
 @Composable
 fun AppNavHost(
@@ -32,6 +33,8 @@ fun AppNavHost(
 ) {
     LaunchedEffect(deepLinkIntent) {
         val recipeId = deepLinkIntent?.data?.extractRecipeId() ?: return@LaunchedEffect
+
+        delay(100)
 
         navController.navigate(Destination.RecipeDetails.createRoute(recipeId)) {
             launchSingleTop = true
