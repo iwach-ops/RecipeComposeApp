@@ -15,9 +15,16 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -25,15 +32,32 @@ import androidx.compose.ui.text.font.FontWeight
 import coil.compose.rememberAsyncImagePainter
 import com.wachtel.androidrecipesapp.core.shareRecipe
 import com.wachtel.androidrecipesapp.core.ui.ScreenHeader
+import com.wachtel.androidrecipesapp.ui.recipes.model.IngredientUiModel
 import com.wachtel.androidrecipesapp.ui.recipes.model.RecipeUiModel
 import com.wachtel.androidrecipesapp.ui.theme.Dimens
+import java.util.Locale
+import kotlin.math.roundToInt
 
 @Composable
 fun RecipeDetailsScreen(
     recipe: RecipeUiModel,
+    isFavorite: Boolean,
+    onFavoriteToggle: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
+
+    var currentPortions by rememberSaveable(recipe.id) {
+        mutableStateOf(1)
+    }
+
+    val recalculatedIngredients = remember(recipe.ingredients, currentPortions) {
+        recipe.ingredients.map { ingredient ->
+            ingredient.copy(
+                quantity = ingredient.quantity.scaleToPortions(currentPortions)
+            )
+        }
+    }
 
     Column(
         modifier = modifier
@@ -51,7 +75,10 @@ fun RecipeDetailsScreen(
                     recipeId = recipe.id,
                     recipeTitle = recipe.title
                 )
-            }
+            },
+            showFavoriteButton = true,
+            isFavorite = isFavorite,
+            onFavoriteClick = onFavoriteToggle
         )
 
         Column(
@@ -60,6 +87,48 @@ fun RecipeDetailsScreen(
                 .padding(Dimens.Space16),
             verticalArrangement = Arrangement.spacedBy(Dimens.Space24)
         ) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(Dimens.Space12)
+            ) {
+                Text(
+                    text = "Количество порций",
+                    style = MaterialTheme.typography.displayLarge,
+                    color = MaterialTheme.colorScheme.primary
+                )
+
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(Dimens.CornerLarge),
+                    tonalElevation = Dimens.CardElevation,
+                    color = MaterialTheme.colorScheme.surface
+                ) {
+                    Column(
+                        modifier = Modifier.padding(Dimens.Space16),
+                        verticalArrangement = Arrangement.spacedBy(Dimens.Space12)
+                    ) {
+                        Text(
+                            text = "$currentPortions",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+
+                        Slider(
+                            value = currentPortions.toFloat(),
+                            onValueChange = { value ->
+                                currentPortions = value.roundToInt()
+                            },
+                            valueRange = 1f..8f,
+                            steps = 6,
+                            colors = SliderDefaults.colors(
+                                thumbColor = MaterialTheme.colorScheme.tertiary,
+                                activeTrackColor = MaterialTheme.colorScheme.tertiaryContainer,
+                                inactiveTrackColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f)
+                            )
+                        )
+                    }
+                }
+            }
+
             Column(
                 verticalArrangement = Arrangement.spacedBy(Dimens.Space12)
             ) {
@@ -81,13 +150,13 @@ fun RecipeDetailsScreen(
                             vertical = Dimens.Space8
                         )
                     ) {
-                        recipe.ingredients.forEachIndexed { index, ingredient ->
+                        recalculatedIngredients.forEachIndexed { index, ingredient ->
                             IngredientItem(
                                 ingredient = ingredient,
                                 modifier = Modifier.padding(vertical = Dimens.Space12)
                             )
 
-                            if (index < recipe.ingredients.lastIndex) {
+                            if (index < recalculatedIngredients.lastIndex) {
                                 HorizontalDivider(
                                     color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
                                 )
@@ -183,4 +252,19 @@ private fun StepItem(
 
 private fun String.removeNumberPrefix(): String {
     return replace(Regex("^\\d+\\.\\s*"), "").trim()
+}
+
+private fun String.scaleToPortions(portions: Int): String {
+    val numericValue = replace(',', '.').toDoubleOrNull() ?: return this
+    val scaledValue = numericValue * portions
+
+    val formatted = if (scaledValue % 1.0 == 0.0) {
+        scaledValue.toInt().toString()
+    } else {
+        String.format(Locale.US, "%.2f", scaledValue)
+            .trimEnd('0')
+            .trimEnd('.')
+    }
+
+    return formatted.replace('.', ',')
 }
