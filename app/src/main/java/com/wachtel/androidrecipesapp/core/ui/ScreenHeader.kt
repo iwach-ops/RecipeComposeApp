@@ -31,6 +31,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import com.wachtel.androidrecipesapp.ui.theme.Dimens
 import com.wachtel.androidrecipesapp.ui.theme.RecipesAppTheme
+import androidx.compose.animation.core.tween
 
 @Composable
 fun ScreenHeader(
@@ -99,6 +100,7 @@ fun ScreenHeader(
                     ) {
                         Crossfade(
                             targetState = isFavorite,
+                            animationSpec = tween(durationMillis = 350),
                             label = "favorite_crossfade"
                         ) { favorite ->
                             val painter = rememberVectorPainter(
