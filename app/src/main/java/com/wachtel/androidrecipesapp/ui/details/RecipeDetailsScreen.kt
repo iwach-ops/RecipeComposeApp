@@ -21,10 +21,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -32,20 +32,25 @@ import androidx.compose.ui.text.font.FontWeight
 import coil.compose.rememberAsyncImagePainter
 import com.wachtel.androidrecipesapp.core.shareRecipe
 import com.wachtel.androidrecipesapp.core.ui.ScreenHeader
-import com.wachtel.androidrecipesapp.ui.recipes.model.IngredientUiModel
 import com.wachtel.androidrecipesapp.ui.recipes.model.RecipeUiModel
 import com.wachtel.androidrecipesapp.ui.theme.Dimens
+import com.wachtel.androidrecipesapp.util.FavoritePrefsManager
 import java.util.Locale
 import kotlin.math.roundToInt
 
 @Composable
 fun RecipeDetailsScreen(
     recipe: RecipeUiModel,
-    isFavorite: Boolean,
-    onFavoriteToggle: () -> Unit,
     modifier: Modifier = Modifier
-) {
+){
     val context = LocalContext.current
+    val favoritePrefsManager = remember(context) {
+        FavoritePrefsManager(context)
+    }
+
+    var isFavorite by remember(recipe.id) {
+        mutableStateOf(favoritePrefsManager.isFavorite(recipe.id))
+    }
 
     var currentPortions by rememberSaveable(recipe.id) {
         mutableStateOf(1)
@@ -78,7 +83,15 @@ fun RecipeDetailsScreen(
             },
             showFavoriteButton = true,
             isFavorite = isFavorite,
-            onFavoriteClick = onFavoriteToggle
+            onFavoriteClick = {
+                isFavorite = if (isFavorite) {
+                    favoritePrefsManager.removeFromFavorites(recipe.id)
+                    false
+                } else {
+                    favoritePrefsManager.addToFavorites(recipe.id)
+                    true
+                }
+            }
         )
 
         Column(
@@ -185,34 +198,6 @@ fun RecipeDetailsScreen(
         }
     }
 }
-
-@Composable
-fun RecipeNotFoundScreen(
-    modifier: Modifier = Modifier
-) {
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(Dimens.Space16),
-        contentAlignment = Alignment.Center
-    ) {
-        Surface(
-            shape = RoundedCornerShape(Dimens.CornerExtraLarge),
-            tonalElevation = Dimens.CardElevation
-        ) {
-            Text(
-                text = "Рецепт не найден",
-                modifier = Modifier.padding(
-                    horizontal = Dimens.Space20,
-                    vertical = Dimens.Space24
-                ),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-    }
-}
-
 @Composable
 private fun StepItem(
     stepNumber: Int,
@@ -267,4 +252,31 @@ private fun String.scaleToPortions(portions: Int): String {
     }
 
     return formatted.replace('.', ',')
+}
+
+@Composable
+fun RecipeNotFoundScreen(
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(Dimens.Space16),
+        contentAlignment = Alignment.Center
+    ) {
+        Surface(
+            shape = RoundedCornerShape(Dimens.CornerExtraLarge),
+            tonalElevation = Dimens.CardElevation
+        ) {
+            Text(
+                text = "Рецепт не найден",
+                modifier = Modifier.padding(
+                    horizontal = Dimens.Space20,
+                    vertical = Dimens.Space24
+                ),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
 }
