@@ -2,6 +2,7 @@ package com.wachtel.androidrecipesapp.util
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.edit
 
 class FavoritePrefsManager(context: Context) {
 
@@ -17,9 +18,9 @@ class FavoritePrefsManager(context: Context) {
             add(recipeId.toString())
         }
 
-        prefs.edit()
-            .putStringSet(FAVORITE_RECIPE_IDS_KEY, updatedFavorites)
-            .apply()
+        prefs.edit {
+            putStringSet(FAVORITE_RECIPE_IDS_KEY, updatedFavorites)
+        }
     }
 
     fun removeFromFavorites(recipeId: Int) {
@@ -27,9 +28,9 @@ class FavoritePrefsManager(context: Context) {
             remove(recipeId.toString())
         }
 
-        prefs.edit()
-            .putStringSet(FAVORITE_RECIPE_IDS_KEY, updatedFavorites)
-            .apply()
+        prefs.edit {
+            putStringSet(FAVORITE_RECIPE_IDS_KEY, updatedFavorites)
+        }
     }
 
     fun getAllFavorites(): Set<String> {
