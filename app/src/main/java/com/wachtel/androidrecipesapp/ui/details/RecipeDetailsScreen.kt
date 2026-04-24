@@ -59,7 +59,7 @@ fun RecipeDetailsScreen(
     LaunchedEffect(recipe.id) {
         isFavorite = favoriteDataStoreManager.isFavorite(recipe.id)
     }
-    coroutineScope
+
     var currentPortions by rememberSaveable(recipe.id) {
         mutableStateOf(1)
     }
