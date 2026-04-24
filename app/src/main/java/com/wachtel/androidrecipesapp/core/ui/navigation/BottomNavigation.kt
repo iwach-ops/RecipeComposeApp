@@ -7,13 +7,20 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import com.wachtel.androidrecipesapp.ui.theme.Dimens
+import com.wachtel.androidrecipesapp.util.FavoriteDataStoreManager
 
 @Composable
 fun BottomNavigation(
@@ -21,6 +28,15 @@ fun BottomNavigation(
     onRecipesClick: () -> Unit,
     onFavoriteClick: () -> Unit
 ) {
+    val context = LocalContext.current
+    val favoriteDataStoreManager = remember(context) {
+        FavoriteDataStoreManager(context)
+    }
+
+    val favoriteCount by favoriteDataStoreManager
+        .getFavoriteCountFlow()
+        .collectAsState(initial = 0)
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -73,10 +89,20 @@ fun BottomNavigation(
                 contentColor = MaterialTheme.colorScheme.onError
             )
         ) {
-            Text(
-                text = "Избранное",
-                style = MaterialTheme.typography.bodySmall
-            )
+            BadgedBox(
+                badge = {
+                    if (favoriteCount > 0) {
+                        Badge {
+                            Text(text = favoriteCount.toString())
+                        }
+                    }
+                }
+            ) {
+                Text(
+                    text = "Избранное",
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
         }
     }
 }
