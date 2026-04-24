@@ -1,27 +1,59 @@
 package com.wachtel.androidrecipesapp.ui.favorites
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import com.wachtel.androidrecipesapp.R
 import com.wachtel.androidrecipesapp.core.ui.ScreenHeader
+import com.wachtel.androidrecipesapp.data.repository.RecipesRepositoryStub
+import com.wachtel.androidrecipesapp.ui.recipes.RecipeItem
+import com.wachtel.androidrecipesapp.ui.recipes.model.RecipeUiModel
+import com.wachtel.androidrecipesapp.ui.recipes.model.toUiModel
 import com.wachtel.androidrecipesapp.ui.theme.Dimens
-import com.wachtel.androidrecipesapp.ui.theme.RecipesAppTheme
+import com.wachtel.androidrecipesapp.util.FavoriteDataStoreManager
+import kotlinx.coroutines.flow.map
 
 @Composable
 fun FavoritesScreen(
+    recipesRepository: RecipesRepositoryStub,
+    favoriteManager: FavoriteDataStoreManager,
+    onRecipeClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val favoriteRecipesFlow = remember(recipesRepository, favoriteManager) {
+        favoriteManager.getFavoriteIdsFlow().map { ids ->
+            ids.mapNotNull { idString ->
+                val recipeId = idString.toIntOrNull() ?: return@mapNotNull null
+
+                recipesRepository
+                    .getRecipeById(recipeId)
+                    ?.toUiModel()
+                    ?.copy(isFavorite = true)
+            }
+        }
+    }
+
+    val favoriteRecipes by favoriteRecipesFlow.collectAsState(
+        initial = emptyList<RecipeUiModel>()
+    )
+
     Column(
         modifier = modifier.fillMaxSize()
     ) {
@@ -31,35 +63,58 @@ fun FavoritesScreen(
             title = "Избранное"
         )
 
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(Dimens.Space16),
-            contentAlignment = Alignment.Center
-        ) {
-            Surface(
-                shape = RoundedCornerShape(Dimens.CornerExtraLarge),
-                tonalElevation = Dimens.CardElevation,
-                color = MaterialTheme.colorScheme.surface.copy(alpha = 0.92f)
+        if (favoriteRecipes.isEmpty()) {
+            EmptyFavoritesContent(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(Dimens.Space16)
+            )
+        } else {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                contentPadding = PaddingValues(Dimens.Space16),
+                verticalArrangement = Arrangement.spacedBy(Dimens.Space12)
             ) {
-                Text(
-                    text = "Здесь скоро появится список избранных рецептов",
-                    modifier = Modifier.padding(
-                        horizontal = Dimens.Space20,
-                        vertical = Dimens.Space24
-                    ),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                items(
+                    items = favoriteRecipes,
+                    key = { recipe -> recipe.id }
+                ) { recipe ->
+                    RecipeItem(
+                        recipe = recipe,
+                        onClick = {
+                            onRecipeClick(recipe.id)
+                        }
+                    )
+                }
             }
         }
     }
 }
 
-@Preview(showBackground = true)
 @Composable
-private fun FavoritesScreenPreview() {
-    RecipesAppTheme {
-        FavoritesScreen()
+private fun EmptyFavoritesContent(
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.Center
+    ) {
+        Surface(
+            shape = RoundedCornerShape(Dimens.CornerExtraLarge),
+            tonalElevation = Dimens.CardElevation,
+            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.92f)
+        ) {
+            Text(
+                text = "У вас пока нет избранных рецептов. Добавьте рецепт в избранное на экране деталей.",
+                modifier = Modifier.padding(
+                    horizontal = Dimens.Space20,
+                    vertical = Dimens.Space24
+                ),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
     }
 }
