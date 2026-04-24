@@ -21,10 +21,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -34,22 +32,32 @@ import com.wachtel.androidrecipesapp.core.shareRecipe
 import com.wachtel.androidrecipesapp.core.ui.ScreenHeader
 import com.wachtel.androidrecipesapp.ui.recipes.model.RecipeUiModel
 import com.wachtel.androidrecipesapp.ui.theme.Dimens
-import com.wachtel.androidrecipesapp.util.FavoritePrefsManager
 import java.util.Locale
 import kotlin.math.roundToInt
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import com.wachtel.androidrecipesapp.util.FavoriteDataStoreManager
+import kotlinx.coroutines.launch
 
 @Composable
 fun RecipeDetailsScreen(
     recipe: RecipeUiModel,
     modifier: Modifier = Modifier
-){
+) {
     val context = LocalContext.current
-    val favoritePrefsManager = remember(context) {
-        FavoritePrefsManager(context)
+    val favoriteDataStoreManager = remember(context) {
+        FavoriteDataStoreManager(context)
     }
+    val coroutineScope = rememberCoroutineScope()
 
     var isFavorite by remember(recipe.id) {
-        mutableStateOf(favoritePrefsManager.isFavorite(recipe.id))
+        mutableStateOf(false)
+    }
+
+    LaunchedEffect(recipe.id) {
+        isFavorite = favoriteDataStoreManager.isFavorite(recipe.id)
     }
 
     var currentPortions by rememberSaveable(recipe.id) {
@@ -84,12 +92,14 @@ fun RecipeDetailsScreen(
             showFavoriteButton = true,
             isFavorite = isFavorite,
             onFavoriteClick = {
-                isFavorite = if (isFavorite) {
-                    favoritePrefsManager.removeFromFavorites(recipe.id)
-                    false
-                } else {
-                    favoritePrefsManager.addToFavorites(recipe.id)
-                    true
+                coroutineScope.launch {
+                    if (isFavorite) {
+                        favoriteDataStoreManager.removeFavorite(recipe.id)
+                        isFavorite = false
+                    } else {
+                        favoriteDataStoreManager.addFavorite(recipe.id)
+                        isFavorite = true
+                    }
                 }
             }
         )
@@ -198,6 +208,7 @@ fun RecipeDetailsScreen(
         }
     }
 }
+
 @Composable
 private fun StepItem(
     stepNumber: Int,
