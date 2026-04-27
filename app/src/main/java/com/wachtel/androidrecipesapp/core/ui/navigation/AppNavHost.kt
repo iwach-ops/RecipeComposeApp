@@ -24,6 +24,9 @@ import com.wachtel.androidrecipesapp.ui.favorites.FavoritesScreen
 import com.wachtel.androidrecipesapp.ui.recipes.RecipesScreen
 import com.wachtel.androidrecipesapp.ui.recipes.model.toUiModel
 import kotlinx.coroutines.delay
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
+import com.wachtel.androidrecipesapp.util.FavoriteDataStoreManager
 
 @Composable
 fun AppNavHost(
@@ -31,6 +34,11 @@ fun AppNavHost(
     deepLinkIntent: Intent?,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+
+    val favoriteDataStoreManager = remember(context) {
+        FavoriteDataStoreManager(context)
+    }
     LaunchedEffect(deepLinkIntent) {
         val recipeId = deepLinkIntent?.data?.extractRecipeId() ?: return@LaunchedEffect
 
@@ -114,7 +122,14 @@ fun AppNavHost(
             )
         ) {
             FavoritesScreen(
-                modifier = Modifier.fillMaxSize()
+                recipesRepository = RecipesRepositoryStub,
+                favoriteManager = favoriteDataStoreManager,
+                modifier = Modifier.fillMaxSize(),
+                onRecipeClick = { recipeId ->
+                    navController.navigate(
+                        Destination.RecipeDetails.createRoute(recipeId)
+                    )
+                }
             )
         }
 
