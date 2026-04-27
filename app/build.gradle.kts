@@ -59,4 +59,7 @@ dependencies {
     implementation(libs.coilCompose)
     implementation(libs.androidxNavigationCompose)
     implementation(libs.androidxDatastorePreferences)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.runtime.compose)
 }

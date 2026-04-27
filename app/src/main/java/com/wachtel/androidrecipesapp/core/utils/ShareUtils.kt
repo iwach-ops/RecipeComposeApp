@@ -1,7 +1,8 @@
-package com.wachtel.androidrecipesapp.core
+package com.wachtel.androidrecipesapp.core.utils
 
 import android.content.Context
 import android.content.Intent
+import com.wachtel.androidrecipesapp.core.createRecipeDeepLink
 
 fun shareRecipe(
     context: Context,

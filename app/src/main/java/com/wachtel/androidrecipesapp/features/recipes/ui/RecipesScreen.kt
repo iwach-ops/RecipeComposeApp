@@ -1,4 +1,4 @@
-package com.wachtel.androidrecipesapp.ui.recipes
+package com.wachtel.androidrecipesapp.features.recipes.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,8 +26,8 @@ import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.tooling.preview.Preview
 import com.wachtel.androidrecipesapp.core.ui.ScreenHeader
 import com.wachtel.androidrecipesapp.data.repository.RecipesRepositoryStub
-import com.wachtel.androidrecipesapp.ui.recipes.model.RecipeUiModel
-import com.wachtel.androidrecipesapp.ui.recipes.model.toUiModel
+import com.wachtel.androidrecipesapp.features.recipes.presentation.model.RecipeUiModel
+import com.wachtel.androidrecipesapp.features.recipes.presentation.model.toUiModel
 import com.wachtel.androidrecipesapp.ui.theme.Dimens
 import com.wachtel.androidrecipesapp.ui.theme.RecipesAppTheme
 

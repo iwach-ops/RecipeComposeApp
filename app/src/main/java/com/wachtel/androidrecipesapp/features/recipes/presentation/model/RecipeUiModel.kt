@@ -1,4 +1,4 @@
-package com.wachtel.androidrecipesapp.ui.recipes.model
+package com.wachtel.androidrecipesapp.features.recipes.presentation.model
 
 import android.os.Parcelable
 import androidx.compose.runtime.Immutable

@@ -20,7 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.wachtel.androidrecipesapp.ui.theme.Dimens
-import com.wachtel.androidrecipesapp.util.FavoriteDataStoreManager
+import com.wachtel.androidrecipesapp.core.utils.FavoriteDataStoreManager
 
 @Composable
 fun BottomNavigation(

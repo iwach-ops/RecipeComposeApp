@@ -1,4 +1,4 @@
-package com.wachtel.androidrecipesapp.util
+package com.wachtel.androidrecipesapp.core.utils
 
 import android.content.Context
 import android.content.SharedPreferences
