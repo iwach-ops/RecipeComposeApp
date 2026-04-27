@@ -34,12 +34,12 @@ import com.wachtel.androidrecipesapp.ui.recipes.model.RecipeUiModel
 import com.wachtel.androidrecipesapp.ui.theme.Dimens
 import java.util.Locale
 import kotlin.math.roundToInt
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import com.wachtel.androidrecipesapp.util.FavoriteDataStoreManager
 import kotlinx.coroutines.launch
+import androidx.compose.runtime.collectAsState
 
 @Composable
 fun RecipeDetailsScreen(
@@ -52,13 +52,9 @@ fun RecipeDetailsScreen(
     }
     val coroutineScope = rememberCoroutineScope()
 
-    var isFavorite by remember(recipe.id) {
-        mutableStateOf(false)
-    }
-
-    LaunchedEffect(recipe.id) {
-        isFavorite = favoriteDataStoreManager.isFavorite(recipe.id)
-    }
+    val isFavorite by remember(recipe.id, favoriteDataStoreManager) {
+        favoriteDataStoreManager.isFavoriteFlow(recipe.id)
+    }.collectAsState(initial = false)
 
     var currentPortions by rememberSaveable(recipe.id) {
         mutableStateOf(1)
@@ -95,10 +91,8 @@ fun RecipeDetailsScreen(
                 coroutineScope.launch {
                     if (isFavorite) {
                         favoriteDataStoreManager.removeFavorite(recipe.id)
-                        isFavorite = false
                     } else {
                         favoriteDataStoreManager.addFavorite(recipe.id)
-                        isFavorite = true
                     }
                 }
             }
