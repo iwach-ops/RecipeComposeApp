@@ -5,7 +5,9 @@ import android.net.Uri
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -16,17 +18,15 @@ import com.wachtel.androidrecipesapp.core.RECIPE_CUSTOM_HOST
 import com.wachtel.androidrecipesapp.core.RECIPE_CUSTOM_SCHEME
 import com.wachtel.androidrecipesapp.core.RECIPE_HOST
 import com.wachtel.androidrecipesapp.core.RECIPE_PATH
+import com.wachtel.androidrecipesapp.core.utils.FavoriteDataStoreManager
 import com.wachtel.androidrecipesapp.data.repository.RecipesRepositoryStub
 import com.wachtel.androidrecipesapp.features.categories.ui.CategoriesScreen
 import com.wachtel.androidrecipesapp.features.details.ui.RecipeDetailsScreen
 import com.wachtel.androidrecipesapp.features.details.ui.RecipeNotFoundScreen
 import com.wachtel.androidrecipesapp.features.favorites.ui.FavoritesScreen
-import com.wachtel.androidrecipesapp.features.recipes.ui.RecipesScreen
 import com.wachtel.androidrecipesapp.features.recipes.presentation.model.toUiModel
+import com.wachtel.androidrecipesapp.features.recipes.ui.RecipesScreen
 import kotlinx.coroutines.delay
-import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
-import com.wachtel.androidrecipesapp.core.utils.FavoriteDataStoreManager
 
 @Composable
 fun AppNavHost(
@@ -39,6 +39,7 @@ fun AppNavHost(
     val favoriteDataStoreManager = remember(context) {
         FavoriteDataStoreManager(context)
     }
+
     LaunchedEffect(deepLinkIntent) {
         val recipeId = deepLinkIntent?.data?.extractRecipeId() ?: return@LaunchedEffect
 
@@ -64,11 +65,12 @@ fun AppNavHost(
         ) {
             CategoriesScreen(
                 modifier = Modifier.fillMaxSize(),
-                onCategoryClick = { categoryId, categoryTitle ->
+                onCategoryClick = { categoryId, categoryTitle, categoryImageUrl ->
                     navController.navigate(
                         Destination.Recipes.createRoute(
                             categoryId = categoryId,
-                            categoryTitle = categoryTitle
+                            categoryTitle = categoryTitle,
+                            categoryImageUrl = categoryImageUrl
                         )
                     )
                 }
@@ -85,6 +87,10 @@ fun AppNavHost(
                 navArgument(Destination.Recipes.categoryTitleArg) {
                     type = NavType.StringType
                     defaultValue = Destination.Recipes.defaultCategoryTitle
+                },
+                navArgument(Destination.Recipes.categoryImageUrlArg) {
+                    type = NavType.StringType
+                    defaultValue = Destination.Recipes.defaultCategoryImageUrl
                 }
             ),
             deepLinks = listOf(
@@ -101,9 +107,14 @@ fun AppNavHost(
                 ?.getString(Destination.Recipes.categoryTitleArg)
                 ?: Destination.Recipes.defaultCategoryTitle
 
+            val categoryImageUrl = backStackEntry.arguments
+                ?.getString(Destination.Recipes.categoryImageUrlArg)
+                ?: Destination.Recipes.defaultCategoryImageUrl
+
             RecipesScreen(
                 categoryId = categoryId,
                 categoryTitle = categoryTitle,
+                categoryImageUrl = categoryImageUrl,
                 modifier = Modifier.fillMaxSize(),
                 onRecipeClick = { recipeId ->
                     navController.navigate(

@@ -21,32 +21,39 @@ sealed class Destination(
     )
 
     object Recipes : Destination(
-        route = "recipes?categoryId={categoryId}&categoryTitle={categoryTitle}",
-        deepLinkPattern = "androidrecipes://recipes?categoryId={categoryId}&categoryTitle={categoryTitle}"
+        route = "recipes?categoryId={categoryId}&categoryTitle={categoryTitle}&categoryImageUrl={categoryImageUrl}",
+        deepLinkPattern = "androidrecipes://recipes?categoryId={categoryId}&categoryTitle={categoryTitle}&categoryImageUrl={categoryImageUrl}"
     ) {
         const val baseRoute = "recipes"
+
         const val categoryIdArg = "categoryId"
         const val categoryTitleArg = "categoryTitle"
+        const val categoryImageUrlArg = "categoryImageUrl"
 
         const val defaultCategoryId = -1
         const val defaultCategoryTitle = "Рецепты"
+        const val defaultCategoryImageUrl = ""
 
         fun createRoute(
             categoryId: Int = defaultCategoryId,
-            categoryTitle: String = defaultCategoryTitle
+            categoryTitle: String = defaultCategoryTitle,
+            categoryImageUrl: String = defaultCategoryImageUrl
         ): String {
             return "$baseRoute?" +
                     "$categoryIdArg=$categoryId&" +
-                    "$categoryTitleArg=${Uri.encode(categoryTitle)}"
+                    "$categoryTitleArg=${Uri.encode(categoryTitle)}&" +
+                    "$categoryImageUrlArg=${Uri.encode(categoryImageUrl)}"
         }
 
         fun createDeepLink(
             categoryId: Int = defaultCategoryId,
-            categoryTitle: String = defaultCategoryTitle
+            categoryTitle: String = defaultCategoryTitle,
+            categoryImageUrl: String = defaultCategoryImageUrl
         ): String {
             return "androidrecipes://recipes?" +
                     "$categoryIdArg=$categoryId&" +
-                    "$categoryTitleArg=${Uri.encode(categoryTitle)}"
+                    "$categoryTitleArg=${Uri.encode(categoryTitle)}&" +
+                    "$categoryImageUrlArg=${Uri.encode(categoryImageUrl)}"
         }
     }
 
