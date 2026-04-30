@@ -1,4 +1,4 @@
-package com.wachtel.androidrecipesapp.ui.details
+package com.wachtel.androidrecipesapp.features.details.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -28,16 +28,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import coil.compose.rememberAsyncImagePainter
-import com.wachtel.androidrecipesapp.core.shareRecipe
+import com.wachtel.androidrecipesapp.core.utils.shareRecipe
 import com.wachtel.androidrecipesapp.core.ui.ScreenHeader
-import com.wachtel.androidrecipesapp.ui.recipes.model.RecipeUiModel
+import com.wachtel.androidrecipesapp.features.recipes.presentation.model.RecipeUiModel
 import com.wachtel.androidrecipesapp.ui.theme.Dimens
 import java.util.Locale
 import kotlin.math.roundToInt
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import com.wachtel.androidrecipesapp.util.FavoriteDataStoreManager
+import com.wachtel.androidrecipesapp.core.utils.FavoriteDataStoreManager
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.collectAsState
 

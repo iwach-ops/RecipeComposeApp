@@ -1,4 +1,4 @@
-package com.wachtel.androidrecipesapp.ui.recipes
+package com.wachtel.androidrecipesapp.features.recipes.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -19,7 +19,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import coil.compose.AsyncImage
-import com.wachtel.androidrecipesapp.ui.recipes.model.RecipeUiModel
+import com.wachtel.androidrecipesapp.features.recipes.presentation.model.RecipeUiModel
 import com.wachtel.androidrecipesapp.ui.theme.Dimens
 
 @Composable

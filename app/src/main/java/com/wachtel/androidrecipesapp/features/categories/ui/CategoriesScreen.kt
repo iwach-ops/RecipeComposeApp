@@ -1,4 +1,4 @@
-package com.wachtel.androidrecipesapp.ui.categories
+package com.wachtel.androidrecipesapp.features.categories.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,7 +16,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.wachtel.androidrecipesapp.R
 import com.wachtel.androidrecipesapp.core.ui.ScreenHeader
 import com.wachtel.androidrecipesapp.data.repository.RecipesRepositoryStub
-import com.wachtel.androidrecipesapp.ui.categories.model.toUiModel
+import com.wachtel.androidrecipesapp.features.categories.presentation.model.toUiModel
 import com.wachtel.androidrecipesapp.ui.theme.Dimens
 import com.wachtel.androidrecipesapp.ui.theme.RecipesAppTheme
 

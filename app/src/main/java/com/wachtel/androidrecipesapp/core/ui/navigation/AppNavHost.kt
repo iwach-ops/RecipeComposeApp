@@ -17,16 +17,16 @@ import com.wachtel.androidrecipesapp.core.RECIPE_CUSTOM_SCHEME
 import com.wachtel.androidrecipesapp.core.RECIPE_HOST
 import com.wachtel.androidrecipesapp.core.RECIPE_PATH
 import com.wachtel.androidrecipesapp.data.repository.RecipesRepositoryStub
-import com.wachtel.androidrecipesapp.ui.categories.CategoriesScreen
-import com.wachtel.androidrecipesapp.ui.details.RecipeDetailsScreen
-import com.wachtel.androidrecipesapp.ui.details.RecipeNotFoundScreen
-import com.wachtel.androidrecipesapp.ui.favorites.FavoritesScreen
-import com.wachtel.androidrecipesapp.ui.recipes.RecipesScreen
-import com.wachtel.androidrecipesapp.ui.recipes.model.toUiModel
+import com.wachtel.androidrecipesapp.features.categories.ui.CategoriesScreen
+import com.wachtel.androidrecipesapp.features.details.ui.RecipeDetailsScreen
+import com.wachtel.androidrecipesapp.features.details.ui.RecipeNotFoundScreen
+import com.wachtel.androidrecipesapp.features.favorites.ui.FavoritesScreen
+import com.wachtel.androidrecipesapp.features.recipes.ui.RecipesScreen
+import com.wachtel.androidrecipesapp.features.recipes.presentation.model.toUiModel
 import kotlinx.coroutines.delay
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
-import com.wachtel.androidrecipesapp.util.FavoriteDataStoreManager
+import com.wachtel.androidrecipesapp.core.utils.FavoriteDataStoreManager
 
 @Composable
 fun AppNavHost(

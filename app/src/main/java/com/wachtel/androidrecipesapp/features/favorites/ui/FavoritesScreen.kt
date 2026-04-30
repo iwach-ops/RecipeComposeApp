@@ -1,4 +1,4 @@
-package com.wachtel.androidrecipesapp.ui.favorites
+package com.wachtel.androidrecipesapp.features.favorites.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,11 +23,11 @@ import androidx.compose.ui.res.painterResource
 import com.wachtel.androidrecipesapp.R
 import com.wachtel.androidrecipesapp.core.ui.ScreenHeader
 import com.wachtel.androidrecipesapp.data.repository.RecipesRepositoryStub
-import com.wachtel.androidrecipesapp.ui.recipes.RecipeItem
-import com.wachtel.androidrecipesapp.ui.recipes.model.RecipeUiModel
-import com.wachtel.androidrecipesapp.ui.recipes.model.toUiModel
+import com.wachtel.androidrecipesapp.features.recipes.ui.RecipeItem
+import com.wachtel.androidrecipesapp.features.recipes.presentation.model.RecipeUiModel
+import com.wachtel.androidrecipesapp.features.recipes.presentation.model.toUiModel
 import com.wachtel.androidrecipesapp.ui.theme.Dimens
-import com.wachtel.androidrecipesapp.util.FavoriteDataStoreManager
+import com.wachtel.androidrecipesapp.core.utils.FavoriteDataStoreManager
 import kotlinx.coroutines.flow.map
 
 @Composable

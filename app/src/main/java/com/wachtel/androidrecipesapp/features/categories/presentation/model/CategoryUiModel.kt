@@ -1,4 +1,4 @@
-package com.wachtel.androidrecipesapp.ui.categories.model
+package com.wachtel.androidrecipesapp.features.categories.presentation.model
 
 import androidx.compose.runtime.Immutable
 import com.wachtel.androidrecipesapp.core.ASSETS_URI_PREFIX
