@@ -30,11 +30,13 @@ import com.wachtel.androidrecipesapp.features.recipes.presentation.model.RecipeU
 import com.wachtel.androidrecipesapp.features.recipes.presentation.model.toUiModel
 import com.wachtel.androidrecipesapp.ui.theme.Dimens
 import com.wachtel.androidrecipesapp.ui.theme.RecipesAppTheme
+import coil.compose.rememberAsyncImagePainter
 
 @Composable
 fun RecipesScreen(
     categoryId: Int,
     categoryTitle: String,
+    categoryImageUrl: String,
     modifier: Modifier = Modifier,
     onRecipeClick: (Int) -> Unit
 ) {
@@ -52,7 +54,11 @@ fun RecipesScreen(
         modifier = modifier.fillMaxSize()
     ) {
         ScreenHeader(
-            imagePainter = ColorPainter(Color(0xFFDCE8FF)),
+            imagePainter = rememberAsyncImagePainter(
+                model = categoryImageUrl,
+                placeholder = ColorPainter(Color(0xFFDCE8FF)),
+                error = ColorPainter(Color(0xFFDCE8FF))
+            ),
             contentDescription = categoryTitle,
             title = categoryTitle
         )
@@ -106,11 +112,11 @@ fun RecipesScreen(
 @Preview(showBackground = true)
 @Composable
 private fun RecipesScreenPreview() {
-    RecipesAppTheme {
-        RecipesScreen(
-            categoryId = 0,
-            categoryTitle = "Бургеры",
-            onRecipeClick = { }
-        )
-    }
+    RecipesScreen(
+        categoryId = 0,
+        categoryTitle = "Бургеры",
+        categoryImageUrl = "",
+        onRecipeClick = { }
+    )
+
 }
