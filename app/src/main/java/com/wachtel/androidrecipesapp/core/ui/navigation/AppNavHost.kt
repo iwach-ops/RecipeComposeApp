@@ -5,9 +5,7 @@ import android.net.Uri
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -18,13 +16,9 @@ import com.wachtel.androidrecipesapp.core.RECIPE_CUSTOM_HOST
 import com.wachtel.androidrecipesapp.core.RECIPE_CUSTOM_SCHEME
 import com.wachtel.androidrecipesapp.core.RECIPE_HOST
 import com.wachtel.androidrecipesapp.core.RECIPE_PATH
-import com.wachtel.androidrecipesapp.core.utils.FavoriteDataStoreManager
-import com.wachtel.androidrecipesapp.data.repository.RecipesRepositoryStub
 import com.wachtel.androidrecipesapp.features.categories.ui.CategoriesScreen
 import com.wachtel.androidrecipesapp.features.details.ui.RecipeDetailsScreen
-import com.wachtel.androidrecipesapp.features.details.ui.RecipeNotFoundScreen
 import com.wachtel.androidrecipesapp.features.favorites.ui.FavoritesScreen
-import com.wachtel.androidrecipesapp.features.recipes.presentation.model.toUiModel
 import com.wachtel.androidrecipesapp.features.recipes.ui.RecipesScreen
 import kotlinx.coroutines.delay
 
@@ -34,12 +28,6 @@ fun AppNavHost(
     deepLinkIntent: Intent?,
     modifier: Modifier = Modifier
 ) {
-    val context = LocalContext.current
-
-    val favoriteDataStoreManager = remember(context) {
-        FavoriteDataStoreManager(context)
-    }
-
     LaunchedEffect(deepLinkIntent) {
         val recipeId = deepLinkIntent?.data?.extractRecipeId() ?: return@LaunchedEffect
 
@@ -118,8 +106,6 @@ fun AppNavHost(
             )
         ) {
             FavoritesScreen(
-                recipesRepository = RecipesRepositoryStub,
-                favoriteManager = favoriteDataStoreManager,
                 modifier = Modifier.fillMaxSize(),
                 onRecipeClick = { recipeId ->
                     navController.navigate(
@@ -136,25 +122,10 @@ fun AppNavHost(
                     type = NavType.IntType
                 }
             )
-        ) { backStackEntry ->
-            val recipeId = backStackEntry.arguments
-                ?.getInt(Destination.RecipeDetails.recipeIdArg)
-                ?: return@composable
-
-            val recipe = RecipesRepositoryStub
-                .getRecipeById(recipeId)
-                ?.toUiModel()
-
-            if (recipe != null) {
-                RecipeDetailsScreen(
-                    recipe = recipe,
-                    modifier = Modifier.fillMaxSize()
-                )
-            } else {
-                RecipeNotFoundScreen(
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
+        ) {
+            RecipeDetailsScreen(
+                modifier = Modifier.fillMaxSize()
+            )
         }
     }
 }
