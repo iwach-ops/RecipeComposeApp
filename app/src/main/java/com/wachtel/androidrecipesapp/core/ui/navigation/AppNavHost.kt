@@ -98,23 +98,8 @@ fun AppNavHost(
                     uriPattern = Destination.Recipes.deepLinkPattern
                 }
             )
-        ) { backStackEntry ->
-            val categoryId = backStackEntry.arguments
-                ?.getInt(Destination.Recipes.categoryIdArg)
-                ?: Destination.Recipes.defaultCategoryId
-
-            val categoryTitle = backStackEntry.arguments
-                ?.getString(Destination.Recipes.categoryTitleArg)
-                ?: Destination.Recipes.defaultCategoryTitle
-
-            val categoryImageUrl = backStackEntry.arguments
-                ?.getString(Destination.Recipes.categoryImageUrlArg)
-                ?: Destination.Recipes.defaultCategoryImageUrl
-
+        ) {
             RecipesScreen(
-                categoryId = categoryId,
-                categoryTitle = categoryTitle,
-                categoryImageUrl = categoryImageUrl,
                 modifier = Modifier.fillMaxSize(),
                 onRecipeClick = { recipeId ->
                     navController.navigate(
