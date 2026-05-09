@@ -13,6 +13,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
@@ -20,53 +22,69 @@ import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
-import com.wachtel.androidrecipesapp.core.utils.shareRecipe
 import com.wachtel.androidrecipesapp.core.ui.ScreenHeader
-import com.wachtel.androidrecipesapp.features.recipes.presentation.model.RecipeUiModel
+import com.wachtel.androidrecipesapp.core.utils.shareRecipe
+import com.wachtel.androidrecipesapp.features.details.presentation.RecipeDetailsViewModel
+import com.wachtel.androidrecipesapp.features.details.presentation.model.RecipeDetailsUiState
 import com.wachtel.androidrecipesapp.ui.theme.Dimens
-import java.util.Locale
 import kotlin.math.roundToInt
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
-import com.wachtel.androidrecipesapp.core.utils.FavoriteDataStoreManager
-import kotlinx.coroutines.launch
-import androidx.compose.runtime.collectAsState
 
 @Composable
 fun RecipeDetailsScreen(
-    recipe: RecipeUiModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: RecipeDetailsViewModel = viewModel()
 ) {
-    val context = LocalContext.current
-    val favoriteDataStoreManager = remember(context) {
-        FavoriteDataStoreManager(context)
-    }
-    val coroutineScope = rememberCoroutineScope()
+    val uiState by viewModel.uiState.collectAsState()
 
-    val isFavorite by remember(recipe.id, favoriteDataStoreManager) {
-        favoriteDataStoreManager.isFavoriteFlow(recipe.id)
-    }.collectAsState(initial = false)
+    when {
+        uiState.isLoading -> {
+            RecipeDetailsLoadingContent(
+                modifier = modifier
+            )
+        }
 
-    var currentPortions by rememberSaveable(recipe.id) {
-        mutableStateOf(1)
-    }
+        uiState.recipe == null && uiState.errorMessage != null -> {
+            RecipeDetailsErrorContent(
+                errorMessage = uiState.errorMessage.orEmpty(),
+                onRetryClick = viewModel::loadRecipe,
+                modifier = modifier
+            )
+        }
 
-    val recalculatedIngredients = remember(recipe.ingredients, currentPortions) {
-        recipe.ingredients.map { ingredient ->
-            ingredient.copy(
-                quantity = ingredient.quantity.scaleToPortions(currentPortions)
+        uiState.recipe == null -> {
+            RecipeNotFoundScreen(
+                modifier = modifier
+            )
+        }
+
+        else -> {
+            RecipeDetailsContent(
+                uiState = uiState,
+                onFavoriteClick = viewModel::toggleFavorite,
+                onPortionsChange = viewModel::updatePortions,
+                modifier = modifier
             )
         }
     }
+}
+
+@Composable
+private fun RecipeDetailsContent(
+    uiState: RecipeDetailsUiState,
+    onFavoriteClick: () -> Unit,
+    onPortionsChange: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val context = LocalContext.current
+    val recipe = uiState.recipe ?: return
 
     Column(
         modifier = modifier
@@ -86,16 +104,8 @@ fun RecipeDetailsScreen(
                 )
             },
             showFavoriteButton = true,
-            isFavorite = isFavorite,
-            onFavoriteClick = {
-                coroutineScope.launch {
-                    if (isFavorite) {
-                        favoriteDataStoreManager.removeFavorite(recipe.id)
-                    } else {
-                        favoriteDataStoreManager.addFavorite(recipe.id)
-                    }
-                }
-            }
+            isFavorite = uiState.isFavorite,
+            onFavoriteClick = onFavoriteClick
         )
 
         Column(
@@ -124,18 +134,20 @@ fun RecipeDetailsScreen(
                         verticalArrangement = Arrangement.spacedBy(Dimens.Space12)
                     ) {
                         Text(
-                            text = "$currentPortions",
+                            text = "${uiState.portions}",
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.onSurface
                         )
 
                         Slider(
-                            value = currentPortions.toFloat(),
+                            value = uiState.portions.toFloat(),
                             onValueChange = { value ->
-                                currentPortions = value.roundToInt()
+                                onPortionsChange(value.roundToInt())
                             },
-                            valueRange = 1f..8f,
-                            steps = 6,
+                            valueRange = RecipeDetailsUiState.MIN_PORTIONS.toFloat()..
+                                    RecipeDetailsUiState.MAX_PORTIONS.toFloat(),
+                            steps = RecipeDetailsUiState.MAX_PORTIONS -
+                                    RecipeDetailsUiState.MIN_PORTIONS - 1,
                             colors = SliderDefaults.colors(
                                 thumbColor = MaterialTheme.colorScheme.tertiary,
                                 activeTrackColor = MaterialTheme.colorScheme.tertiaryContainer,
@@ -167,13 +179,13 @@ fun RecipeDetailsScreen(
                             vertical = Dimens.Space8
                         )
                     ) {
-                        recalculatedIngredients.forEachIndexed { index, ingredient ->
+                        uiState.recalculatedIngredients.forEachIndexed { index, ingredient ->
                             IngredientItem(
                                 ingredient = ingredient,
                                 modifier = Modifier.padding(vertical = Dimens.Space12)
                             )
 
-                            if (index < recalculatedIngredients.lastIndex) {
+                            if (index < uiState.recalculatedIngredients.lastIndex) {
                                 HorizontalDivider(
                                     color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
                                 )
@@ -197,6 +209,58 @@ fun RecipeDetailsScreen(
                         stepNumber = index + 1,
                         text = step.removeNumberPrefix()
                     )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun RecipeDetailsLoadingContent(
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator()
+    }
+}
+
+@Composable
+private fun RecipeDetailsErrorContent(
+    errorMessage: String,
+    onRetryClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(Dimens.Space16),
+        contentAlignment = Alignment.Center
+    ) {
+        Surface(
+            shape = RoundedCornerShape(Dimens.CornerExtraLarge),
+            tonalElevation = Dimens.CardElevation
+        ) {
+            Column(
+                modifier = Modifier.padding(
+                    horizontal = Dimens.Space20,
+                    vertical = Dimens.Space24
+                ),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(Dimens.Space12)
+            ) {
+                Text(
+                    text = errorMessage,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.error
+                )
+
+                Button(
+                    onClick = onRetryClick
+                ) {
+                    Text(text = "Повторить")
                 }
             }
         }
@@ -242,21 +306,6 @@ private fun StepItem(
 
 private fun String.removeNumberPrefix(): String {
     return replace(Regex("^\\d+\\.\\s*"), "").trim()
-}
-
-private fun String.scaleToPortions(portions: Int): String {
-    val numericValue = replace(',', '.').toDoubleOrNull() ?: return this
-    val scaledValue = numericValue * portions
-
-    val formatted = if (scaledValue % 1.0 == 0.0) {
-        scaledValue.toInt().toString()
-    } else {
-        String.format(Locale.US, "%.2f", scaledValue)
-            .trimEnd('0')
-            .trimEnd('.')
-    }
-
-    return formatted.replace('.', ',')
 }
 
 @Composable
