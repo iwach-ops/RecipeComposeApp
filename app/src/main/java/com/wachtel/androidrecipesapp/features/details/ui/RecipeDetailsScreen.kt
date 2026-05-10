@@ -40,7 +40,9 @@ import kotlin.math.roundToInt
 @Composable
 fun RecipeDetailsScreen(
     modifier: Modifier = Modifier,
-    viewModel: RecipeDetailsViewModel = viewModel()
+    viewModel: RecipeDetailsViewModel = viewModel(
+        factory = RecipeDetailsViewModel.Factory
+    )
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
