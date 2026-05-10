@@ -40,11 +40,9 @@ class MainActivity : ComponentActivity() {
         Thread {
             Log.d(TAG, "Выполняю запрос на потоке: ${Thread.currentThread().name}")
 
-            var connection: HttpURLConnection? = null
+            val connection = URL(CATEGORIES_URL).openConnection() as HttpURLConnection
 
             try {
-                connection = URL(CATEGORIES_URL).openConnection() as HttpURLConnection
-
                 connection.requestMethod = "GET"
                 connection.connectTimeout = 10_000
                 connection.readTimeout = 10_000
@@ -73,7 +71,7 @@ class MainActivity : ComponentActivity() {
             } catch (exception: Exception) {
                 Log.e(TAG, "Ошибка при выполнении сетевого запроса", exception)
             } finally {
-                connection?.disconnect()
+                connection.disconnect()
             }
         }.start()
     }
