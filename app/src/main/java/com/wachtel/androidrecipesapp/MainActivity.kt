@@ -9,26 +9,39 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.lifecycleScope
+import com.wachtel.androidrecipesapp.core.network.NetworkConfig
+import com.wachtel.androidrecipesapp.core.network.api.RecipesApiService
 import com.wachtel.androidrecipesapp.data.model.CategoryDto
-import kotlinx.serialization.decodeFromString
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.jsonArray
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
-import kotlin.concurrent.thread
+import okhttp3.MediaType.Companion.toMediaType
+import retrofit2.Retrofit
+import retrofit2.converter.kotlinx.serialization.asConverterFactory
 
+@OptIn(ExperimentalSerializationApi::class)
 class MainActivity : ComponentActivity() {
 
     private var deepLinkIntent by mutableStateOf<Intent?>(null)
 
-    private val okHttpClient = OkHttpClient()
-
-    private val threadPool: ExecutorService = Executors.newFixedThreadPool(10)
-
     private val json = Json {
         ignoreUnknownKeys = true
+        coerceInputValues = true
+    }
+
+    private val retrofit: Retrofit by lazy {
+        Retrofit.Builder()
+            .baseUrl(NetworkConfig.BASE_URL)
+            .addConverterFactory(
+                json.asConverterFactory("application/json".toMediaType())
+            )
+            .build()
+    }
+
+    private val recipesApiService: RecipesApiService by lazy {
+        retrofit.create(RecipesApiService::class.java)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,12 +63,11 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun loadCategoriesFromNetwork() {
-        thread(name = "CategoriesThread") {
+        lifecycleScope.launch(Dispatchers.IO) {
             try {
                 Log.d(TAG, "Запрос категорий на потоке: ${Thread.currentThread().name}")
 
-                val responseBody = executeGetRequest(CATEGORIES_URL)
-                val categories = json.decodeFromString<List<CategoryDto>>(responseBody)
+                val categories = recipesApiService.getCategories()
 
                 Log.d(
                     TAG,
@@ -76,56 +88,30 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun loadRecipesForCategory(category: CategoryDto) {
-        threadPool.execute {
-            try {
-                Log.d(
-                    TAG,
-                    "Запрос рецептов категории \"${category.title}\" на потоке: ${Thread.currentThread().name}"
-                )
+    private suspend fun loadRecipesForCategory(category: CategoryDto) {
+        try {
+            Log.d(
+                TAG,
+                "Запрос рецептов категории \"${category.title}\" на потоке: ${Thread.currentThread().name}"
+            )
 
-                val recipesUrl = "$CATEGORIES_URL/${category.id}/recipes"
-                val responseBody = executeGetRequest(recipesUrl)
+            val recipes = recipesApiService.getRecipesByCategory(category.id)
 
-                val recipesCount = json
-                    .parseToJsonElement(responseBody)
-                    .jsonArray
-                    .size
+            Log.d(
+                TAG,
+                "Поток: ${Thread.currentThread().name}. Категория: ${category.title}. Рецептов: ${recipes.size}"
+            )
 
-                Log.d(
-                    TAG,
-                    "Поток: ${Thread.currentThread().name}. Категория: ${category.title}. Рецептов: $recipesCount"
-                )
-
-                Log.d(
-                    TAG,
-                    "Поток: ${Thread.currentThread().name}. Ответ рецептов категории \"${category.title}\": $responseBody"
-                )
-            } catch (exception: Exception) {
-                Log.e(
-                    TAG,
-                    "Ошибка при запросе рецептов. Категория: ${category.title}, id: ${category.id}",
-                    exception
-                )
-            }
-        }
-    }
-
-    private fun executeGetRequest(url: String): String {
-        val request = Request.Builder()
-            .url(url)
-            .build()
-
-        okHttpClient.newCall(request).execute().use { response ->
-            val responseBody = response.body?.string().orEmpty()
-
-            if (!response.isSuccessful) {
-                throw IllegalStateException(
-                    "Код ответа: ${response.code}. Тело ответа: $responseBody"
-                )
-            }
-
-            return responseBody
+            Log.d(
+                TAG,
+                "Поток: ${Thread.currentThread().name}. Рецепты категории \"${category.title}\": $recipes"
+            )
+        } catch (exception: Exception) {
+            Log.e(
+                TAG,
+                "Ошибка при запросе рецептов. Категория: ${category.title}, id: ${category.id}",
+                exception
+            )
         }
     }
 
@@ -135,13 +121,7 @@ class MainActivity : ComponentActivity() {
         deepLinkIntent = if (intent.data != null) intent else null
     }
 
-    override fun onDestroy() {
-        threadPool.shutdown()
-        super.onDestroy()
-    }
-
     companion object {
-        private const val TAG = "Pool"
-        private const val CATEGORIES_URL = "https://recipes.androidsprint.ru/api/category"
+        private const val TAG = "Retrofit"
     }
 }
