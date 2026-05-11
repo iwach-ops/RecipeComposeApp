@@ -13,14 +13,17 @@ import com.wachtel.androidrecipesapp.data.model.CategoryDto
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
-import java.net.HttpURLConnection
-import java.net.URL
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import kotlin.concurrent.thread
 
 class MainActivity : ComponentActivity() {
 
     private var deepLinkIntent by mutableStateOf<Intent?>(null)
+
+    private val okHttpClient = OkHttpClient()
 
     private val threadPool: ExecutorService = Executors.newFixedThreadPool(10)
 
@@ -47,15 +50,11 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun loadCategoriesFromNetwork() {
-        threadPool.execute {
-            var connection: HttpURLConnection? = null
-
+        thread(name = "CategoriesThread") {
             try {
                 Log.d(TAG, "Запрос категорий на потоке: ${Thread.currentThread().name}")
 
-                connection = URL(CATEGORIES_URL).openConnection() as HttpURLConnection
-
-                val responseBody = executeGetRequest(connection)
+                val responseBody = executeGetRequest(CATEGORIES_URL)
                 val categories = json.decodeFromString<List<CategoryDto>>(responseBody)
 
                 Log.d(
@@ -63,21 +62,22 @@ class MainActivity : ComponentActivity() {
                     "Поток: ${Thread.currentThread().name}. Получено категорий: ${categories.size}"
                 )
 
+                Log.d(
+                    TAG,
+                    "Поток: ${Thread.currentThread().name}. Категории: $categories"
+                )
+
                 categories.forEach { category ->
                     loadRecipesForCategory(category)
                 }
             } catch (exception: Exception) {
                 Log.e(TAG, "Ошибка при запросе категорий", exception)
-            } finally {
-                connection?.disconnect()
             }
         }
     }
 
     private fun loadRecipesForCategory(category: CategoryDto) {
         threadPool.execute {
-            var connection: HttpURLConnection? = null
-
             try {
                 Log.d(
                     TAG,
@@ -85,9 +85,7 @@ class MainActivity : ComponentActivity() {
                 )
 
                 val recipesUrl = "$CATEGORIES_URL/${category.id}/recipes"
-                connection = URL(recipesUrl).openConnection() as HttpURLConnection
-
-                val responseBody = executeGetRequest(connection)
+                val responseBody = executeGetRequest(recipesUrl)
 
                 val recipesCount = json
                     .parseToJsonElement(responseBody)
@@ -98,36 +96,37 @@ class MainActivity : ComponentActivity() {
                     TAG,
                     "Поток: ${Thread.currentThread().name}. Категория: ${category.title}. Рецептов: $recipesCount"
                 )
+
+                Log.d(
+                    TAG,
+                    "Поток: ${Thread.currentThread().name}. Ответ рецептов категории \"${category.title}\": $responseBody"
+                )
             } catch (exception: Exception) {
                 Log.e(
                     TAG,
                     "Ошибка при запросе рецептов. Категория: ${category.title}, id: ${category.id}",
                     exception
                 )
-            } finally {
-                connection?.disconnect()
             }
         }
     }
 
-    private fun executeGetRequest(connection: HttpURLConnection): String {
-        connection.requestMethod = "GET"
-        connection.connectTimeout = 10_000
-        connection.readTimeout = 10_000
+    private fun executeGetRequest(url: String): String {
+        val request = Request.Builder()
+            .url(url)
+            .build()
 
-        val responseCode = connection.responseCode
+        okHttpClient.newCall(request).execute().use { response ->
+            val responseBody = response.body?.string().orEmpty()
 
-        val responseBody = if (responseCode in 200..299) {
-            connection.inputStream.bufferedReader().use { it.readText() }
-        } else {
-            connection.errorStream?.bufferedReader()?.use { it.readText() }.orEmpty()
+            if (!response.isSuccessful) {
+                throw IllegalStateException(
+                    "Код ответа: ${response.code}. Тело ответа: $responseBody"
+                )
+            }
+
+            return responseBody
         }
-
-        if (responseCode !in 200..299) {
-            throw IllegalStateException("Код ответа: $responseCode. Тело ответа: $responseBody")
-        }
-
-        return responseBody
     }
 
     override fun onNewIntent(intent: Intent) {
