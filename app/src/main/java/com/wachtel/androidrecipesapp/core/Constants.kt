@@ -9,6 +9,7 @@ const val PARAM_CATEGORY_IMAGE_URL = "categoryImageUrl"
 const val PARAM_RECIPE_ID = "recipeId"
 
 const val ASSETS_URI_PREFIX = "file:///android_asset/"
+const val IMAGES_BASE_URL = "https://recipes.androidsprint.ru/api/images/"
 
 const val RECIPES_BASE_ROUTE = "recipes"
 const val RECIPE_BASE_ROUTE = "recipe"
