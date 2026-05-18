@@ -2,7 +2,7 @@ package com.wachtel.androidrecipesapp.features.categories.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.wachtel.androidrecipesapp.data.repository.RecipesRepositoryStub
+import com.wachtel.androidrecipesapp.data.repository.RecipesRepository
 import com.wachtel.androidrecipesapp.features.categories.presentation.model.CategoriesUiState
 import com.wachtel.androidrecipesapp.features.categories.presentation.model.toUiModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,7 +11,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class CategoriesViewModel : ViewModel() {
+class CategoriesViewModel(
+    private val repository: RecipesRepository
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CategoriesUiState())
     val uiState: StateFlow<CategoriesUiState> = _uiState.asStateFlow()
@@ -30,7 +32,7 @@ class CategoriesViewModel : ViewModel() {
             }
 
             runCatching {
-                RecipesRepositoryStub
+                repository
                     .getCategories()
                     .map { categoryDto -> categoryDto.toUiModel() }
             }.onSuccess { categories ->
