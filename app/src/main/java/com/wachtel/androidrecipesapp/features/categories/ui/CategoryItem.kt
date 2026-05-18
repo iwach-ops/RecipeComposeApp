@@ -13,14 +13,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import coil.compose.AsyncImage
 import com.wachtel.androidrecipesapp.features.categories.presentation.model.CategoryUiModel
 import com.wachtel.androidrecipesapp.ui.theme.Dimens
-import androidx.compose.runtime.remember
+import com.wachtel.androidrecipesapp.core.ui.RecipeImage
 
 @Composable
 fun CategoryItem(
@@ -28,11 +26,6 @@ fun CategoryItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val surfaceVariant = MaterialTheme.colorScheme.surfaceVariant
-    val fallbackPainter = remember(surfaceVariant) {
-        ColorPainter(surfaceVariant)
-    }
-
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -45,8 +38,8 @@ fun CategoryItem(
             containerColor = MaterialTheme.colorScheme.surface
         )
     ) {
-        AsyncImage(
-            model = category.imageUrl,
+        RecipeImage(
+            imageUrl = category.imageUrl,
             contentDescription = category.title,
             modifier = Modifier
                 .fillMaxWidth()
@@ -57,9 +50,7 @@ fun CategoryItem(
                         topEnd = Dimens.CornerLarge
                     )
                 ),
-            contentScale = ContentScale.Crop,
-            placeholder = fallbackPainter,
-            error = fallbackPainter
+            contentScale = ContentScale.Crop
         )
 
         Column(
