@@ -1,5 +1,9 @@
 package com.wachtel.androidrecipesapp.core.ui.navigation
 
+import com.wachtel.androidrecipesapp.BuildConfig
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
+import java.util.concurrent.TimeUnit
 import android.app.Application
 import androidx.compose.ui.platform.LocalContext
 import com.wachtel.androidrecipesapp.core.PARAM_RECIPE_ID
@@ -214,6 +218,7 @@ private fun Uri.extractRecipeId(): Int? {
         else -> null
     }
 }
+
 @OptIn(ExperimentalSerializationApi::class)
 private fun createRecipesApiService(): RecipesApiService {
     val json = Json {
@@ -221,8 +226,24 @@ private fun createRecipesApiService(): RecipesApiService {
         coerceInputValues = true
     }
 
+    val loggingInterceptor = HttpLoggingInterceptor().apply {
+        level = if (BuildConfig.DEBUG) {
+            HttpLoggingInterceptor.Level.BODY
+        } else {
+            HttpLoggingInterceptor.Level.NONE
+        }
+    }
+
+    val okHttpClient = OkHttpClient.Builder()
+        .connectTimeout(15, TimeUnit.SECONDS)
+        .readTimeout(30, TimeUnit.SECONDS)
+        .writeTimeout(30, TimeUnit.SECONDS)
+        .addInterceptor(loggingInterceptor)
+        .build()
+
     val retrofit = Retrofit.Builder()
         .baseUrl(NetworkConfig.BASE_URL)
+        .client(okHttpClient)
         .addConverterFactory(
             json.asConverterFactory("application/json".toMediaType())
         )
