@@ -1,5 +1,22 @@
 package com.wachtel.androidrecipesapp.core.ui.navigation
 
+import android.app.Application
+import androidx.compose.ui.platform.LocalContext
+import com.wachtel.androidrecipesapp.core.PARAM_RECIPE_ID
+import com.wachtel.androidrecipesapp.features.details.presentation.RecipeDetailsViewModel
+import androidx.lifecycle.SavedStateHandle
+import com.wachtel.androidrecipesapp.core.PARAM_CATEGORY_ID
+import com.wachtel.androidrecipesapp.core.PARAM_CATEGORY_IMAGE_URL
+import com.wachtel.androidrecipesapp.core.PARAM_CATEGORY_TITLE
+import androidx.compose.runtime.remember
+import com.wachtel.androidrecipesapp.core.network.NetworkConfig
+import com.wachtel.androidrecipesapp.core.network.api.RecipesApiService
+import com.wachtel.androidrecipesapp.data.repository.RecipesRepositoryImpl
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaType
+import retrofit2.Retrofit
+import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,6 +38,7 @@ import com.wachtel.androidrecipesapp.features.details.ui.RecipeDetailsScreen
 import com.wachtel.androidrecipesapp.features.favorites.ui.FavoritesScreen
 import com.wachtel.androidrecipesapp.features.recipes.ui.RecipesScreen
 import kotlinx.coroutines.delay
+import com.wachtel.androidrecipesapp.features.recipes.presentation.RecipesViewModel
 
 @Composable
 fun AppNavHost(
@@ -28,6 +46,13 @@ fun AppNavHost(
     deepLinkIntent: Intent?,
     modifier: Modifier = Modifier
 ) {
+    val apiService = remember {
+        createRecipesApiService()
+    }
+
+    val repository = remember(apiService) {
+        RecipesRepositoryImpl(apiService)
+    }
     LaunchedEffect(deepLinkIntent) {
         val recipeId = deepLinkIntent?.data?.extractRecipeId() ?: return@LaunchedEffect
 
@@ -52,15 +77,15 @@ fun AppNavHost(
             )
         ) {
             CategoriesScreen(
+                repository = repository,
                 modifier = Modifier.fillMaxSize(),
                 onCategoryClick = { categoryId, categoryTitle, categoryImageUrl ->
-                    navController.navigate(
-                        Destination.Recipes.createRoute(
-                            categoryId = categoryId,
-                            categoryTitle = categoryTitle,
-                            categoryImageUrl = categoryImageUrl
-                        )
+                        val route = Destination.Recipes.createRoute(
+                        categoryId = categoryId,
+                        categoryTitle = categoryTitle,
+                        categoryImageUrl = categoryImageUrl
                     )
+                    navController.navigate(route)
                 }
             )
         }
@@ -86,8 +111,31 @@ fun AppNavHost(
                     uriPattern = Destination.Recipes.deepLinkPattern
                 }
             )
-        ) {
+        ) { backStackEntry ->
+            val savedStateHandle = remember(backStackEntry) {
+                SavedStateHandle(
+                    mapOf(
+                        PARAM_CATEGORY_ID to backStackEntry.arguments
+                            ?.getInt(Destination.Recipes.categoryIdArg),
+
+                        PARAM_CATEGORY_TITLE to backStackEntry.arguments
+                            ?.getString(Destination.Recipes.categoryTitleArg),
+
+                        PARAM_CATEGORY_IMAGE_URL to backStackEntry.arguments
+                            ?.getString(Destination.Recipes.categoryImageUrlArg)
+                    )
+                )
+            }
+
+            val viewModel = remember(backStackEntry, repository) {
+                RecipesViewModel(
+                    savedStateHandle = savedStateHandle,
+                    repository = repository
+                )
+            }
+
             RecipesScreen(
+                viewModel = viewModel,
                 modifier = Modifier.fillMaxSize(),
                 onRecipeClick = { recipeId ->
                     navController.navigate(
@@ -122,8 +170,28 @@ fun AppNavHost(
                     type = NavType.IntType
                 }
             )
-        ) {
+        ) { backStackEntry ->
+            val context = LocalContext.current
+
+            val savedStateHandle = remember(backStackEntry) {
+                SavedStateHandle(
+                    mapOf(
+                        PARAM_RECIPE_ID to backStackEntry.arguments
+                            ?.getInt(Destination.RecipeDetails.recipeIdArg)
+                    )
+                )
+            }
+
+            val viewModel = remember(backStackEntry, repository, context) {
+                RecipeDetailsViewModel(
+                    application = context.applicationContext as Application,
+                    savedStateHandle = savedStateHandle,
+                    repository = repository
+                )
+            }
+
             RecipeDetailsScreen(
+                viewModel = viewModel,
                 modifier = Modifier.fillMaxSize()
             )
         }
@@ -145,4 +213,20 @@ private fun Uri.extractRecipeId(): Int? {
 
         else -> null
     }
+}
+@OptIn(ExperimentalSerializationApi::class)
+private fun createRecipesApiService(): RecipesApiService {
+    val json = Json {
+        ignoreUnknownKeys = true
+        coerceInputValues = true
+    }
+
+    val retrofit = Retrofit.Builder()
+        .baseUrl(NetworkConfig.BASE_URL)
+        .addConverterFactory(
+            json.asConverterFactory("application/json".toMediaType())
+        )
+        .build()
+
+    return retrofit.create(RecipesApiService::class.java)
 }

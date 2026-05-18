@@ -23,7 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.wachtel.androidrecipesapp.core.ui.ScreenHeader
 import com.wachtel.androidrecipesapp.features.recipes.presentation.RecipesViewModel
@@ -35,10 +34,10 @@ import com.wachtel.androidrecipesapp.ui.theme.RecipesAppTheme
 
 @Composable
 fun RecipesScreen(
+    viewModel: RecipesViewModel,
     modifier: Modifier = Modifier,
     onRecipeClick: (Int) -> Unit
 ) {
-    val viewModel: RecipesViewModel = viewModel()
     val uiState by viewModel.uiState.collectAsState()
 
     RecipesScreenContent(

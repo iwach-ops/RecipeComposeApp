@@ -9,7 +9,7 @@ import com.wachtel.androidrecipesapp.core.DEFAULT_CATEGORY_TITLE
 import com.wachtel.androidrecipesapp.core.PARAM_CATEGORY_ID
 import com.wachtel.androidrecipesapp.core.PARAM_CATEGORY_IMAGE_URL
 import com.wachtel.androidrecipesapp.core.PARAM_CATEGORY_TITLE
-import com.wachtel.androidrecipesapp.data.repository.RecipesRepositoryStub
+import com.wachtel.androidrecipesapp.data.repository.RecipesRepository
 import com.wachtel.androidrecipesapp.features.recipes.presentation.model.RecipesUiState
 import com.wachtel.androidrecipesapp.features.recipes.presentation.model.toUiModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,9 +19,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
+import android.util.Log
 
 class RecipesViewModel(
-    savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle,
+    private val repository: RecipesRepository
 ) : ViewModel() {
 
     private val categoryId: Int = savedStateHandle[PARAM_CATEGORY_ID] ?: DEFAULT_CATEGORY_ID
@@ -56,8 +58,8 @@ class RecipesViewModel(
             }
 
             runCatching {
-                RecipesRepositoryStub
-                    .getRecipesByCategoryId(categoryId)
+                repository
+                    .getRecipesByCategory(categoryId)
                     .map { recipeDto -> recipeDto.toUiModel() }
             }.onSuccess { recipes ->
                 _uiState.update {

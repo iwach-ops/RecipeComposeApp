@@ -28,7 +28,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.wachtel.androidrecipesapp.core.ui.ScreenHeader
 import com.wachtel.androidrecipesapp.core.utils.shareRecipe
@@ -39,10 +38,8 @@ import kotlin.math.roundToInt
 
 @Composable
 fun RecipeDetailsScreen(
-    modifier: Modifier = Modifier,
-    viewModel: RecipeDetailsViewModel = viewModel(
-        factory = RecipeDetailsViewModel.Factory
-    )
+    viewModel: RecipeDetailsViewModel,
+    modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
