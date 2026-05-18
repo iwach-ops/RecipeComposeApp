@@ -38,6 +38,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -66,4 +67,5 @@ dependencies {
     implementation(libs.kotlinxSerializationJson)
     implementation(libs.retrofit)
     implementation(libs.retrofitKotlinxSerializationConverter)
+    implementation(libs.okhttpLoggingInterceptor)
 }
