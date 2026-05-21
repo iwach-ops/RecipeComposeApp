@@ -1,5 +1,6 @@
 package com.wachtel.androidrecipesapp.core.ui
 
+import androidx.compose.runtime.remember
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,11 +26,15 @@ fun RecipeImage(
 ) {
     val context = LocalContext.current
 
-    SubcomposeAsyncImage(
-        model = ImageRequest.Builder(context)
+    val imageRequest = remember(imageUrl, context) {
+        ImageRequest.Builder(context)
             .data(imageUrl)
             .crossfade(true)
-            .build(),
+            .build()
+    }
+
+    SubcomposeAsyncImage(
+        model = imageRequest,
         contentDescription = contentDescription,
         modifier = modifier,
         contentScale = contentScale,
