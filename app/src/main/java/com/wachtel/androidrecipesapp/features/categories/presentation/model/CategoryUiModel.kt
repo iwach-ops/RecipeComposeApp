@@ -1,7 +1,7 @@
 package com.wachtel.androidrecipesapp.features.categories.presentation.model
 
 import androidx.compose.runtime.Immutable
-import com.wachtel.androidrecipesapp.core.ASSETS_URI_PREFIX
+import com.wachtel.androidrecipesapp.core.IMAGES_BASE_URL
 import com.wachtel.androidrecipesapp.data.model.CategoryDto
 
 @Immutable
@@ -20,7 +20,7 @@ fun CategoryDto.toUiModel(): CategoryUiModel {
         imageUrl = if (imageUrl.startsWith("http", ignoreCase = true)) {
             imageUrl
         } else {
-            ASSETS_URI_PREFIX + imageUrl
+            IMAGES_BASE_URL + imageUrl
         }
     )
 }

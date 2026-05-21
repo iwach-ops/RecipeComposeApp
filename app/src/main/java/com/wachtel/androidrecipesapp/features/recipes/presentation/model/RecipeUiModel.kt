@@ -2,7 +2,7 @@ package com.wachtel.androidrecipesapp.features.recipes.presentation.model
 
 import android.os.Parcelable
 import androidx.compose.runtime.Immutable
-import com.wachtel.androidrecipesapp.core.ASSETS_URI_PREFIX
+import com.wachtel.androidrecipesapp.core.IMAGES_BASE_URL
 import com.wachtel.androidrecipesapp.data.model.RecipeDto
 import kotlinx.parcelize.Parcelize
 
@@ -24,7 +24,7 @@ fun RecipeDto.toUiModel(): RecipeUiModel {
         imageUrl = if (imageUrl.startsWith("http", ignoreCase = true)) {
             imageUrl
         } else {
-            ASSETS_URI_PREFIX + imageUrl
+            IMAGES_BASE_URL + imageUrl
         },
         ingredients = ingredients.map { it.toUiModel() },
         method = method,
