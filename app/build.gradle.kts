@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlinCompose)
     alias(libs.plugins.kotlinParcelize)
     alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -68,4 +69,7 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.retrofitKotlinxSerializationConverter)
     implementation(libs.okhttpLoggingInterceptor)
+    implementation(libs.androidxRoomRuntime)
+    implementation(libs.androidxRoomKtx)
+    ksp(libs.androidxRoomCompiler)
 }
