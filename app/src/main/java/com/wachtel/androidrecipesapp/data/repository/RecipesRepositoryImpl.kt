@@ -1,6 +1,7 @@
 package com.wachtel.androidrecipesapp.data.repository
 
 import android.util.Log
+import com.wachtel.androidrecipesapp.core.DEFAULT_CATEGORY_ID
 import com.wachtel.androidrecipesapp.core.network.api.RecipesApiService
 import com.wachtel.androidrecipesapp.data.database.RecipesDatabase
 import com.wachtel.androidrecipesapp.data.model.CategoryDto
@@ -14,7 +15,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class RecipesRepositoryImpl(
     private val apiService: RecipesApiService,
@@ -94,24 +94,41 @@ class RecipesRepositoryImpl(
             }
     }
 
-    override suspend fun getRecipe(recipeId: Int): RecipeDto {
-        return withContext(Dispatchers.IO) {
+    override fun getRecipe(recipeId: Int): Flow<RecipeDto?> {
+        repositoryScope.launch {
             try {
-                apiService.getRecipe(recipeId)
+                val freshRecipe = apiService.getRecipe(recipeId)
+
+                val categoryId = recipeDao
+                    .getRecipeById(recipeId)
+                    .first()
+                    ?.categoryId
+                    ?: DEFAULT_CATEGORY_ID
+
+                recipeDao.insertRecipes(
+                    listOf(
+                        freshRecipe.toEntity(categoryId = categoryId)
+                    )
+                )
+
+                Log.d(
+                    TAG,
+                    "Рецепт $recipeId обновлен из API"
+                )
             } catch (exception: Exception) {
                 Log.e(
                     TAG,
-                    "Ошибка при загрузке рецепта из API: $recipeId",
+                    "Ошибка при обновлении рецепта: $recipeId",
                     exception
                 )
-
-                recipeDao
-                    .getRecipeById(recipeId)
-                    .first()
-                    ?.toDto()
-                    ?: throw exception
             }
         }
+
+        return recipeDao
+            .getRecipeById(recipeId)
+            .map { recipeEntity ->
+                recipeEntity?.toDto()
+            }
     }
 
     companion object {

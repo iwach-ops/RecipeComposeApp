@@ -10,9 +10,11 @@ import com.wachtel.androidrecipesapp.data.repository.RecipesRepository
 import com.wachtel.androidrecipesapp.features.details.presentation.model.RecipeDetailsUiState
 import com.wachtel.androidrecipesapp.features.recipes.presentation.model.RecipeUiModel
 import com.wachtel.androidrecipesapp.features.recipes.presentation.model.toUiModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.stateIn
@@ -26,12 +28,14 @@ class RecipeDetailsViewModel(
 
     private val favoriteDataStoreManager = FavoriteDataStoreManager(application)
 
-    private var selectedRecipeId: Int =
+    private val selectedRecipeId: Int =
         savedStateHandle[PARAM_RECIPE_ID] ?: INVALID_RECIPE_ID
 
     private val recipeFlow = MutableStateFlow<RecipeUiModel?>(null)
-    private val isLoadingFlow = MutableStateFlow(false)
+    private val isLoadingFlow = MutableStateFlow(true)
     private val errorMessageFlow = MutableStateFlow<String?>(null)
+
+    private var recipeJob: Job? = null
 
     private val portionsFlow: StateFlow<Int> =
         savedStateHandle.getStateFlow(
@@ -69,15 +73,16 @@ class RecipeDetailsViewModel(
     )
 
     init {
-        loadRecipe()
+        observeRecipe()
     }
 
-    fun loadRecipe(recipeId: Int) {
-        selectedRecipeId = recipeId
-        loadRecipe()
+    fun retryRecipe() {
+        observeRecipe()
     }
 
-    fun loadRecipe() {
+    private fun observeRecipe() {
+        recipeJob?.cancel()
+
         if (selectedRecipeId == INVALID_RECIPE_ID) {
             recipeFlow.value = null
             isLoadingFlow.value = false
@@ -85,21 +90,28 @@ class RecipeDetailsViewModel(
             return
         }
 
-        viewModelScope.launch {
+        recipeJob = viewModelScope.launch {
             isLoadingFlow.value = true
             errorMessageFlow.value = null
 
-            runCatching {
-                repository.getRecipe(selectedRecipeId).toUiModel()
-            }.onSuccess { recipe ->
-                recipeFlow.value = recipe
-                isLoadingFlow.value = false
-                errorMessageFlow.value = null
-            }.onFailure { throwable ->
-                recipeFlow.value = null
-                isLoadingFlow.value = false
-                errorMessageFlow.value = throwable.message ?: ERROR_MESSAGE
-            }
+            repository
+                .getRecipe(selectedRecipeId)
+                .catch { throwable ->
+                    recipeFlow.value = null
+                    isLoadingFlow.value = false
+                    errorMessageFlow.value = throwable.message ?: ERROR_MESSAGE
+                }
+                .collect { recipeDto ->
+                    if (recipeDto == null) {
+                        recipeFlow.value = null
+                        isLoadingFlow.value = true
+                        errorMessageFlow.value = null
+                    } else {
+                        recipeFlow.value = recipeDto.toUiModel()
+                        isLoadingFlow.value = false
+                        errorMessageFlow.value = null
+                    }
+                }
         }
     }
 

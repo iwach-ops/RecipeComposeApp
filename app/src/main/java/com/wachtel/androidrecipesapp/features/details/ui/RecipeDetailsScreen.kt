@@ -53,7 +53,7 @@ fun RecipeDetailsScreen(
         uiState.recipe == null && uiState.errorMessage != null -> {
             RecipeDetailsErrorContent(
                 errorMessage = uiState.errorMessage.orEmpty(),
-                onRetryClick = viewModel::loadRecipe,
+                onRetryClick = viewModel::retryRecipe,
                 modifier = modifier
             )
         }
