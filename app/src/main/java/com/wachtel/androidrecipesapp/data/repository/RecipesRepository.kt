@@ -2,12 +2,13 @@ package com.wachtel.androidrecipesapp.data.repository
 
 import com.wachtel.androidrecipesapp.data.model.CategoryDto
 import com.wachtel.androidrecipesapp.data.model.RecipeDto
+import kotlinx.coroutines.flow.Flow
 
 interface RecipesRepository {
 
-    suspend fun getCategories(): List<CategoryDto>
+    fun getCategories(): Flow<List<CategoryDto>>
 
-    suspend fun getRecipesByCategory(categoryId: Int): List<RecipeDto>
+    fun getRecipesByCategory(categoryId: Int): Flow<List<RecipeDto>>
 
     suspend fun getRecipe(recipeId: Int): RecipeDto
 }

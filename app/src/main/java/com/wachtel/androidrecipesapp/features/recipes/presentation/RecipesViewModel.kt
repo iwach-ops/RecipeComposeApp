@@ -12,21 +12,24 @@ import com.wachtel.androidrecipesapp.core.PARAM_CATEGORY_TITLE
 import com.wachtel.androidrecipesapp.data.repository.RecipesRepository
 import com.wachtel.androidrecipesapp.features.recipes.presentation.model.RecipesUiState
 import com.wachtel.androidrecipesapp.features.recipes.presentation.model.toUiModel
+import java.net.URLDecoder
+import java.nio.charset.StandardCharsets
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.net.URLDecoder
-import java.nio.charset.StandardCharsets
-import android.util.Log
 
 class RecipesViewModel(
     savedStateHandle: SavedStateHandle,
     private val repository: RecipesRepository
 ) : ViewModel() {
 
-    private val categoryId: Int = savedStateHandle[PARAM_CATEGORY_ID] ?: DEFAULT_CATEGORY_ID
+    private val categoryId: Int =
+        savedStateHandle[PARAM_CATEGORY_ID] ?: DEFAULT_CATEGORY_ID
 
     private val categoryTitle: String = decodeArgument(
         savedStateHandle[PARAM_CATEGORY_TITLE] ?: DEFAULT_CATEGORY_TITLE
@@ -44,12 +47,16 @@ class RecipesViewModel(
     )
     val uiState: StateFlow<RecipesUiState> = _uiState.asStateFlow()
 
+    private var recipesJob: Job? = null
+
     init {
         loadRecipes()
     }
 
     fun loadRecipes() {
-        viewModelScope.launch {
+        recipesJob?.cancel()
+
+        recipesJob = viewModelScope.launch {
             _uiState.update {
                 it.copy(
                     isLoading = true,
@@ -57,28 +64,33 @@ class RecipesViewModel(
                 )
             }
 
-            runCatching {
-                repository
-                    .getRecipesByCategory(categoryId)
-                    .map { recipeDto -> recipeDto.toUiModel() }
-            }.onSuccess { recipes ->
-                _uiState.update {
-                    it.copy(
-                        recipes = recipes,
-                        categoryTitle = categoryTitle,
-                        categoryImageUrl = categoryImageUrl,
-                        isLoading = false,
-                        errorMessage = null
-                    )
+            repository
+                .getRecipesByCategory(categoryId)
+                .map { recipes ->
+                    recipes.map { recipeDto ->
+                        recipeDto.toUiModel()
+                    }
                 }
-            }.onFailure { throwable ->
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        errorMessage = throwable.message ?: "Не удалось загрузить рецепты"
-                    )
+                .catch { throwable ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = throwable.message
+                                ?: "Не удалось загрузить рецепты"
+                        )
+                    }
                 }
-            }
+                .collect { recipes ->
+                    _uiState.update {
+                        it.copy(
+                            recipes = recipes,
+                            categoryTitle = categoryTitle,
+                            categoryImageUrl = categoryImageUrl,
+                            isLoading = false,
+                            errorMessage = null
+                        )
+                    }
+                }
         }
     }
 

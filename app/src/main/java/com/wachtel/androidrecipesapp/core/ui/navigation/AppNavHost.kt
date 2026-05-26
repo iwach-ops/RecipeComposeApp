@@ -43,6 +43,7 @@ import com.wachtel.androidrecipesapp.features.favorites.ui.FavoritesScreen
 import com.wachtel.androidrecipesapp.features.recipes.ui.RecipesScreen
 import kotlinx.coroutines.delay
 import com.wachtel.androidrecipesapp.features.recipes.presentation.RecipesViewModel
+import com.wachtel.androidrecipesapp.data.database.RecipesDatabase
 
 @Composable
 fun AppNavHost(
@@ -50,12 +51,21 @@ fun AppNavHost(
     deepLinkIntent: Intent?,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+
     val apiService = remember {
         createRecipesApiService()
     }
 
-    val repository = remember(apiService) {
-        RecipesRepositoryImpl(apiService)
+    val database = remember(context) {
+        RecipesDatabase.buildDatabase(context)
+    }
+
+    val repository = remember(apiService, database) {
+        RecipesRepositoryImpl(
+            apiService = apiService,
+            database = database
+        )
     }
     LaunchedEffect(deepLinkIntent) {
         val recipeId = deepLinkIntent?.data?.extractRecipeId() ?: return@LaunchedEffect
