@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.flowOf
 
 class RecipesRepositoryImpl(
     private val apiService: RecipesApiService,
@@ -128,6 +129,19 @@ class RecipesRepositoryImpl(
             .getRecipeById(recipeId)
             .map { recipeEntity ->
                 recipeEntity?.toDto()
+            }
+    }
+
+    override fun getRecipesByIds(recipeIds: List<Int>): Flow<List<RecipeDto>> {
+        if (recipeIds.isEmpty()) {
+            return flowOf(emptyList())
+        }
+        return recipeDao
+            .getRecipesByIds(recipeIds)
+            .map { entities ->
+                entities.map { recipeEntity ->
+                    recipeEntity.toDto()
+                }
             }
     }
 

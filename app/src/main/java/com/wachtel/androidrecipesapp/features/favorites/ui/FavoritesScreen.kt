@@ -20,7 +20,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.wachtel.androidrecipesapp.R
 import com.wachtel.androidrecipesapp.core.ui.ScreenHeader
 import com.wachtel.androidrecipesapp.features.favorites.presentation.FavoritesViewModel
@@ -30,9 +29,9 @@ import com.wachtel.androidrecipesapp.ui.theme.Dimens
 
 @Composable
 fun FavoritesScreen(
+    viewModel: FavoritesViewModel,
     onRecipeClick: (Int) -> Unit,
-    modifier: Modifier = Modifier,
-    viewModel: FavoritesViewModel = viewModel()
+    modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
