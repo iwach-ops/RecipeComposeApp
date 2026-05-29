@@ -44,6 +44,7 @@ import com.wachtel.androidrecipesapp.features.recipes.ui.RecipesScreen
 import kotlinx.coroutines.delay
 import com.wachtel.androidrecipesapp.features.recipes.presentation.RecipesViewModel
 import com.wachtel.androidrecipesapp.data.database.RecipesDatabase
+import com.wachtel.androidrecipesapp.features.favorites.presentation.FavoritesViewModel
 
 @Composable
 fun AppNavHost(
@@ -167,7 +168,15 @@ fun AppNavHost(
                 }
             )
         ) {
+            val viewModel = remember(repository, context) {
+                FavoritesViewModel(
+                    application = context.applicationContext as Application,
+                    repository = repository
+                )
+            }
+
             FavoritesScreen(
+                viewModel = viewModel,
                 modifier = Modifier.fillMaxSize(),
                 onRecipeClick = { recipeId ->
                     navController.navigate(
