@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.kotlinParcelize)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt)
 }
 
 android {
@@ -31,17 +32,22 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "17"
     }
     buildFeatures {
         compose = true
         buildConfig = true
     }
 }
+
+hilt {
+    enableAggregatingTask = false
+}
+
 
 dependencies {
     implementation(libs.androidxCoreKtx)
@@ -72,4 +78,7 @@ dependencies {
     implementation(libs.androidxRoomRuntime)
     implementation(libs.androidxRoomKtx)
     ksp(libs.androidxRoomCompiler)
+    implementation(libs.hiltAndroid)
+    ksp(libs.hiltCompiler)
+    implementation(libs.androidxHiltNavigationCompose)
 }

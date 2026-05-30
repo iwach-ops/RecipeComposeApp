@@ -35,11 +35,12 @@ import com.wachtel.androidrecipesapp.features.details.presentation.RecipeDetails
 import com.wachtel.androidrecipesapp.features.details.presentation.model.RecipeDetailsUiState
 import com.wachtel.androidrecipesapp.ui.theme.Dimens
 import kotlin.math.roundToInt
+import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
 fun RecipeDetailsScreen(
-    viewModel: RecipeDetailsViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: RecipeDetailsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
 

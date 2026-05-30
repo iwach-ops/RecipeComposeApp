@@ -28,28 +28,14 @@ import com.wachtel.androidrecipesapp.features.categories.presentation.model.Cate
 import com.wachtel.androidrecipesapp.features.categories.presentation.model.CategoryUiModel
 import com.wachtel.androidrecipesapp.ui.theme.Dimens
 import com.wachtel.androidrecipesapp.ui.theme.RecipesAppTheme
-import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
-import com.wachtel.androidrecipesapp.app.di.CategoriesViewModelFactory
-import com.wachtel.androidrecipesapp.app.di.RecipeApplication
+import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
 fun CategoriesScreen(
     modifier: Modifier = Modifier,
-    onCategoryClick: (Int, String, String) -> Unit
+    onCategoryClick: (Int, String, String) -> Unit,
+    viewModel: CategoriesViewModel = hiltViewModel()
 ) {
-    val context = LocalContext.current
-
-    val appContainer = remember(context) {
-        (context.applicationContext as RecipeApplication).appContainer
-    }
-
-    val viewModel = remember(appContainer) {
-        CategoriesViewModelFactory(
-            repository = appContainer.recipesRepository
-        ).create()
-    }
-
     val uiState by viewModel.uiState.collectAsState()
 
     CategoriesScreenContent(

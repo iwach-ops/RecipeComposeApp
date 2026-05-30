@@ -31,12 +31,13 @@ import com.wachtel.androidrecipesapp.features.recipes.presentation.model.RecipeU
 import com.wachtel.androidrecipesapp.features.recipes.presentation.model.RecipesUiState
 import com.wachtel.androidrecipesapp.ui.theme.Dimens
 import com.wachtel.androidrecipesapp.ui.theme.RecipesAppTheme
+import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
 fun RecipesScreen(
-    viewModel: RecipesViewModel,
     modifier: Modifier = Modifier,
-    onRecipeClick: (Int) -> Unit
+    onRecipeClick: (Int) -> Unit,
+    viewModel: RecipesViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
 

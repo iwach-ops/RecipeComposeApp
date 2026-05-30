@@ -1,12 +1,13 @@
 package com.wachtel.androidrecipesapp.features.favorites.presentation
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.wachtel.androidrecipesapp.core.utils.FavoriteDataStoreManager
 import com.wachtel.androidrecipesapp.data.repository.RecipesRepository
 import com.wachtel.androidrecipesapp.features.favorites.presentation.model.FavoritesUiState
 import com.wachtel.androidrecipesapp.features.recipes.presentation.model.toUiModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -17,12 +18,11 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 
-class FavoritesViewModel(
-    application: Application,
+@HiltViewModel
+class FavoritesViewModel @Inject constructor(
+    private val favoriteDataStoreManager: FavoriteDataStoreManager,
     private val repository: RecipesRepository
-) : AndroidViewModel(application) {
-
-    private val favoriteDataStoreManager = FavoriteDataStoreManager(application)
+) : ViewModel() {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val uiState: StateFlow<FavoritesUiState> = favoriteDataStoreManager
