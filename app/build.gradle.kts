@@ -80,5 +80,5 @@ dependencies {
     ksp(libs.androidxRoomCompiler)
     implementation(libs.hiltAndroid)
     ksp(libs.hiltCompiler)
-    implementation(libs.androidxHiltLifecycleViewmodelCompose)
+    implementation(libs.androidxHiltNavigationCompose)
 }

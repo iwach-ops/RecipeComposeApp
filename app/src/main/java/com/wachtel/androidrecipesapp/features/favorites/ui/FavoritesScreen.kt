@@ -26,7 +26,7 @@ import com.wachtel.androidrecipesapp.features.favorites.presentation.FavoritesVi
 import com.wachtel.androidrecipesapp.features.favorites.presentation.model.FavoritesUiState
 import com.wachtel.androidrecipesapp.features.recipes.ui.RecipeItem
 import com.wachtel.androidrecipesapp.ui.theme.Dimens
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
 fun FavoritesScreen(

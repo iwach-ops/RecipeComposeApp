@@ -51,7 +51,7 @@ androidxRoomKtx = { module = "androidx.room:room-ktx", version.ref = "room" }
 androidxRoomCompiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 hiltAndroid = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 hiltCompiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }
-androidxHiltLifecycleViewmodelCompose = { module = "androidx.hilt:hilt-lifecycle-viewmodel-compose", version.ref = "androidxHilt" }
+androidxHiltNavigationCompose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "androidxHilt" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

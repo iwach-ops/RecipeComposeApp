@@ -28,7 +28,7 @@ import com.wachtel.androidrecipesapp.features.categories.presentation.model.Cate
 import com.wachtel.androidrecipesapp.features.categories.presentation.model.CategoryUiModel
 import com.wachtel.androidrecipesapp.ui.theme.Dimens
 import com.wachtel.androidrecipesapp.ui.theme.RecipesAppTheme
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
 fun CategoriesScreen(
