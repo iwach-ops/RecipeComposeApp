@@ -1,7 +1,5 @@
 package com.wachtel.androidrecipesapp.features.details.presentation
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.wachtel.androidrecipesapp.core.PARAM_RECIPE_ID
@@ -19,14 +17,16 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import androidx.lifecycle.ViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class RecipeDetailsViewModel(
-    application: Application,
+@HiltViewModel
+class RecipeDetailsViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
-    private val repository: RecipesRepository
-) : AndroidViewModel(application) {
-
-    private val favoriteDataStoreManager = FavoriteDataStoreManager(application)
+    private val repository: RecipesRepository,
+    private val favoriteDataStoreManager: FavoriteDataStoreManager
+) : ViewModel() {
 
     private val selectedRecipeId: Int =
         savedStateHandle[PARAM_RECIPE_ID] ?: INVALID_RECIPE_ID

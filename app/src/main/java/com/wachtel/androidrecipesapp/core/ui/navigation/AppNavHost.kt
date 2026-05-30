@@ -1,28 +1,17 @@
 package com.wachtel.androidrecipesapp.core.ui.navigation
 
-import android.app.Application
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
-import com.wachtel.androidrecipesapp.app.di.RecipeApplication
-import com.wachtel.androidrecipesapp.app.di.RecipeDetailsViewModelFactory
-import com.wachtel.androidrecipesapp.app.di.RecipesViewModelFactory
-import com.wachtel.androidrecipesapp.core.PARAM_CATEGORY_ID
-import com.wachtel.androidrecipesapp.core.PARAM_CATEGORY_IMAGE_URL
-import com.wachtel.androidrecipesapp.core.PARAM_CATEGORY_TITLE
-import com.wachtel.androidrecipesapp.core.PARAM_RECIPE_ID
 import com.wachtel.androidrecipesapp.core.RECIPE_CUSTOM_HOST
 import com.wachtel.androidrecipesapp.core.RECIPE_CUSTOM_SCHEME
 import com.wachtel.androidrecipesapp.core.RECIPE_HOST
@@ -39,13 +28,6 @@ fun AppNavHost(
     deepLinkIntent: Intent?,
     modifier: Modifier = Modifier
 ) {
-    val context = LocalContext.current
-    val application = context.applicationContext as Application
-
-    val appContainer = remember(context) {
-        (context.applicationContext as RecipeApplication).appContainer
-    }
-
     LaunchedEffect(deepLinkIntent) {
         val recipeId = deepLinkIntent?.data?.extractRecipeId() ?: return@LaunchedEffect
 
@@ -104,31 +86,8 @@ fun AppNavHost(
                     uriPattern = Destination.Recipes.deepLinkPattern
                 }
             )
-        ) { backStackEntry ->
-            val savedStateHandle = remember(backStackEntry) {
-                SavedStateHandle(
-                    mapOf(
-                        PARAM_CATEGORY_ID to backStackEntry.arguments
-                            ?.getInt(Destination.Recipes.categoryIdArg),
-
-                        PARAM_CATEGORY_TITLE to backStackEntry.arguments
-                            ?.getString(Destination.Recipes.categoryTitleArg),
-
-                        PARAM_CATEGORY_IMAGE_URL to backStackEntry.arguments
-                            ?.getString(Destination.Recipes.categoryImageUrlArg)
-                    )
-                )
-            }
-
-            val viewModel = remember(backStackEntry, appContainer) {
-                RecipesViewModelFactory(
-                    savedStateHandle = savedStateHandle,
-                    repository = appContainer.recipesRepository
-                ).create()
-            }
-
+        ) {
             RecipesScreen(
-                viewModel = viewModel,
                 modifier = Modifier.fillMaxSize(),
                 onRecipeClick = { recipeId ->
                     navController.navigate(
@@ -163,26 +122,8 @@ fun AppNavHost(
                     type = NavType.IntType
                 }
             )
-        ) { backStackEntry ->
-            val savedStateHandle = remember(backStackEntry) {
-                SavedStateHandle(
-                    mapOf(
-                        PARAM_RECIPE_ID to backStackEntry.arguments
-                            ?.getInt(Destination.RecipeDetails.recipeIdArg)
-                    )
-                )
-            }
-
-            val viewModel = remember(backStackEntry, appContainer, application) {
-                RecipeDetailsViewModelFactory(
-                    application = application,
-                    savedStateHandle = savedStateHandle,
-                    repository = appContainer.recipesRepository
-                ).create()
-            }
-
+        ) {
             RecipeDetailsScreen(
-                viewModel = viewModel,
                 modifier = Modifier.fillMaxSize()
             )
         }
