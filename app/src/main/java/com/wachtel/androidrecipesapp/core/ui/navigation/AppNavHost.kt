@@ -1,38 +1,28 @@
 package com.wachtel.androidrecipesapp.core.ui.navigation
 
-import com.wachtel.androidrecipesapp.BuildConfig
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
-import java.util.concurrent.TimeUnit
 import android.app.Application
-import androidx.compose.ui.platform.LocalContext
-import com.wachtel.androidrecipesapp.core.PARAM_RECIPE_ID
-import com.wachtel.androidrecipesapp.features.details.presentation.RecipeDetailsViewModel
-import androidx.lifecycle.SavedStateHandle
-import com.wachtel.androidrecipesapp.core.PARAM_CATEGORY_ID
-import com.wachtel.androidrecipesapp.core.PARAM_CATEGORY_IMAGE_URL
-import com.wachtel.androidrecipesapp.core.PARAM_CATEGORY_TITLE
-import androidx.compose.runtime.remember
-import com.wachtel.androidrecipesapp.core.network.NetworkConfig
-import com.wachtel.androidrecipesapp.core.network.api.RecipesApiService
-import com.wachtel.androidrecipesapp.data.repository.RecipesRepositoryImpl
-import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.json.Json
-import okhttp3.MediaType.Companion.toMediaType
-import retrofit2.Retrofit
-import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import com.wachtel.androidrecipesapp.app.di.RecipeApplication
+import com.wachtel.androidrecipesapp.app.di.RecipeDetailsViewModelFactory
+import com.wachtel.androidrecipesapp.app.di.RecipesViewModelFactory
+import com.wachtel.androidrecipesapp.core.PARAM_CATEGORY_ID
+import com.wachtel.androidrecipesapp.core.PARAM_CATEGORY_IMAGE_URL
+import com.wachtel.androidrecipesapp.core.PARAM_CATEGORY_TITLE
+import com.wachtel.androidrecipesapp.core.PARAM_RECIPE_ID
 import com.wachtel.androidrecipesapp.core.RECIPE_CUSTOM_HOST
 import com.wachtel.androidrecipesapp.core.RECIPE_CUSTOM_SCHEME
 import com.wachtel.androidrecipesapp.core.RECIPE_HOST
@@ -42,9 +32,6 @@ import com.wachtel.androidrecipesapp.features.details.ui.RecipeDetailsScreen
 import com.wachtel.androidrecipesapp.features.favorites.ui.FavoritesScreen
 import com.wachtel.androidrecipesapp.features.recipes.ui.RecipesScreen
 import kotlinx.coroutines.delay
-import com.wachtel.androidrecipesapp.features.recipes.presentation.RecipesViewModel
-import com.wachtel.androidrecipesapp.data.database.RecipesDatabase
-import com.wachtel.androidrecipesapp.features.favorites.presentation.FavoritesViewModel
 
 @Composable
 fun AppNavHost(
@@ -53,21 +40,12 @@ fun AppNavHost(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
+    val application = context.applicationContext as Application
 
-    val apiService = remember {
-        createRecipesApiService()
+    val appContainer = remember(context) {
+        (context.applicationContext as RecipeApplication).appContainer
     }
 
-    val database = remember(context) {
-        RecipesDatabase.buildDatabase(context)
-    }
-
-    val repository = remember(apiService, database) {
-        RecipesRepositoryImpl(
-            apiService = apiService,
-            database = database
-        )
-    }
     LaunchedEffect(deepLinkIntent) {
         val recipeId = deepLinkIntent?.data?.extractRecipeId() ?: return@LaunchedEffect
 
@@ -92,14 +70,14 @@ fun AppNavHost(
             )
         ) {
             CategoriesScreen(
-                repository = repository,
                 modifier = Modifier.fillMaxSize(),
                 onCategoryClick = { categoryId, categoryTitle, categoryImageUrl ->
-                        val route = Destination.Recipes.createRoute(
+                    val route = Destination.Recipes.createRoute(
                         categoryId = categoryId,
                         categoryTitle = categoryTitle,
                         categoryImageUrl = categoryImageUrl
                     )
+
                     navController.navigate(route)
                 }
             )
@@ -142,11 +120,11 @@ fun AppNavHost(
                 )
             }
 
-            val viewModel = remember(backStackEntry, repository) {
-                RecipesViewModel(
+            val viewModel = remember(backStackEntry, appContainer) {
+                RecipesViewModelFactory(
                     savedStateHandle = savedStateHandle,
-                    repository = repository
-                )
+                    repository = appContainer.recipesRepository
+                ).create()
             }
 
             RecipesScreen(
@@ -168,15 +146,7 @@ fun AppNavHost(
                 }
             )
         ) {
-            val viewModel = remember(repository, context) {
-                FavoritesViewModel(
-                    application = context.applicationContext as Application,
-                    repository = repository
-                )
-            }
-
             FavoritesScreen(
-                viewModel = viewModel,
                 modifier = Modifier.fillMaxSize(),
                 onRecipeClick = { recipeId ->
                     navController.navigate(
@@ -194,8 +164,6 @@ fun AppNavHost(
                 }
             )
         ) { backStackEntry ->
-            val context = LocalContext.current
-
             val savedStateHandle = remember(backStackEntry) {
                 SavedStateHandle(
                     mapOf(
@@ -205,12 +173,12 @@ fun AppNavHost(
                 )
             }
 
-            val viewModel = remember(backStackEntry, repository, context) {
-                RecipeDetailsViewModel(
-                    application = context.applicationContext as Application,
+            val viewModel = remember(backStackEntry, appContainer, application) {
+                RecipeDetailsViewModelFactory(
+                    application = application,
                     savedStateHandle = savedStateHandle,
-                    repository = repository
-                )
+                    repository = appContainer.recipesRepository
+                ).create()
             }
 
             RecipeDetailsScreen(
@@ -236,37 +204,4 @@ private fun Uri.extractRecipeId(): Int? {
 
         else -> null
     }
-}
-
-@OptIn(ExperimentalSerializationApi::class)
-private fun createRecipesApiService(): RecipesApiService {
-    val json = Json {
-        ignoreUnknownKeys = true
-        coerceInputValues = true
-    }
-
-    val loggingInterceptor = HttpLoggingInterceptor().apply {
-        level = if (BuildConfig.DEBUG) {
-            HttpLoggingInterceptor.Level.BODY
-        } else {
-            HttpLoggingInterceptor.Level.NONE
-        }
-    }
-
-    val okHttpClient = OkHttpClient.Builder()
-        .connectTimeout(15, TimeUnit.SECONDS)
-        .readTimeout(30, TimeUnit.SECONDS)
-        .writeTimeout(30, TimeUnit.SECONDS)
-        .addInterceptor(loggingInterceptor)
-        .build()
-
-    val retrofit = Retrofit.Builder()
-        .baseUrl(NetworkConfig.BASE_URL)
-        .client(okHttpClient)
-        .addConverterFactory(
-            json.asConverterFactory("application/json".toMediaType())
-        )
-        .build()
-
-    return retrofit.create(RecipesApiService::class.java)
 }

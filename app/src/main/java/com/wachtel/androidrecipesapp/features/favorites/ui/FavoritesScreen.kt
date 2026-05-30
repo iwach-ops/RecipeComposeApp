@@ -26,13 +26,31 @@ import com.wachtel.androidrecipesapp.features.favorites.presentation.FavoritesVi
 import com.wachtel.androidrecipesapp.features.favorites.presentation.model.FavoritesUiState
 import com.wachtel.androidrecipesapp.features.recipes.ui.RecipeItem
 import com.wachtel.androidrecipesapp.ui.theme.Dimens
+import android.app.Application
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
+import com.wachtel.androidrecipesapp.app.di.FavoritesViewModelFactory
+import com.wachtel.androidrecipesapp.app.di.RecipeApplication
 
 @Composable
 fun FavoritesScreen(
-    viewModel: FavoritesViewModel,
     onRecipeClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+    val application = context.applicationContext as Application
+
+    val appContainer = remember(context) {
+        (context.applicationContext as RecipeApplication).appContainer
+    }
+
+    val viewModel = remember(application, appContainer) {
+        FavoritesViewModelFactory(
+            application = application,
+            repository = appContainer.recipesRepository
+        ).create()
+    }
+
     val uiState by viewModel.uiState.collectAsState()
 
     FavoritesScreenContent(
