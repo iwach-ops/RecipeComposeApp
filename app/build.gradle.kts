@@ -42,6 +42,11 @@ android {
         compose = true
         buildConfig = true
     }
+    testOptions {
+        unitTests {
+            isReturnDefaultValues = true
+        }
+    }
 }
 
 hilt {
@@ -84,4 +89,8 @@ dependencies {
     implementation(libs.hiltAndroid)
     ksp(libs.hiltCompiler)
     implementation(libs.androidxHiltNavigationCompose)
+    testImplementation(libs.junit)
+    testImplementation(libs.mockk)
+    testImplementation(libs.coroutines.test)
+    testImplementation(libs.turbine)
 }
