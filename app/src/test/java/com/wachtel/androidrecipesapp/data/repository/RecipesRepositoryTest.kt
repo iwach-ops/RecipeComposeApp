@@ -21,6 +21,7 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import java.io.IOException
 
 class RecipesRepositoryTest {
 
@@ -98,7 +99,7 @@ class RecipesRepositoryTest {
         )
 
         every { categoryDao.getAllCategories() } returns flowOf(cachedCategories)
-        coEvery { apiService.getCategories() } throws RuntimeException("Network error")
+        coEvery { apiService.getCategories() } throws IOException("Network error")
 
         // Act + Assert
         repository.getCategories().test {
