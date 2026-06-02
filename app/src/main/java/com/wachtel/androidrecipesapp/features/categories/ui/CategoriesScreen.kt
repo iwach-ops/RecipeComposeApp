@@ -29,6 +29,7 @@ import com.wachtel.androidrecipesapp.features.categories.presentation.model.Cate
 import com.wachtel.androidrecipesapp.ui.theme.Dimens
 import com.wachtel.androidrecipesapp.ui.theme.RecipesAppTheme
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.ui.platform.testTag
 
 @Composable
 fun CategoriesScreen(
@@ -38,20 +39,20 @@ fun CategoriesScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    CategoriesScreenContent(
+    CategoriesContent(
         uiState = uiState,
+        onCategoryClick = onCategoryClick,
         modifier = modifier,
-        onRetryClick = viewModel::loadCategories,
-        onCategoryClick = onCategoryClick
+        onRetryClick = viewModel::loadCategories
     )
 }
 
 @Composable
-private fun CategoriesScreenContent(
+fun CategoriesContent(
     uiState: CategoriesUiState,
+    onCategoryClick: (Int, String, String) -> Unit,
     modifier: Modifier = Modifier,
-    onRetryClick: () -> Unit,
-    onCategoryClick: (Int, String, String) -> Unit
+    onRetryClick: () -> Unit = {}
 ) {
     Column(
         modifier = modifier.fillMaxSize()
@@ -70,7 +71,9 @@ private fun CategoriesScreenContent(
                         .weight(1f),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator()
+                    CircularProgressIndicator(
+                        modifier = Modifier.testTag("loading_indicator")
+                    )
                 }
             }
 
@@ -88,6 +91,7 @@ private fun CategoriesScreenContent(
                     ) {
                         Text(
                             text = uiState.errorMessage,
+                            modifier = Modifier.testTag("error_message"),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.error
                         )
@@ -134,7 +138,7 @@ private fun CategoriesScreenContent(
 @Composable
 private fun CategoriesScreenPreview() {
     RecipesAppTheme {
-        CategoriesScreenContent(
+        CategoriesContent(
             uiState = CategoriesUiState(
                 categories = listOf(
                     CategoryUiModel(
