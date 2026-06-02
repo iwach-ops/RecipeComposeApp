@@ -32,6 +32,7 @@ import com.wachtel.androidrecipesapp.features.recipes.presentation.model.Recipes
 import com.wachtel.androidrecipesapp.ui.theme.Dimens
 import com.wachtel.androidrecipesapp.ui.theme.RecipesAppTheme
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.ui.platform.testTag
 
 @Composable
 fun RecipesScreen(
@@ -41,20 +42,20 @@ fun RecipesScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    RecipesScreenContent(
+    RecipesContent(
         uiState = uiState,
+        onRecipeClick = onRecipeClick,
         modifier = modifier,
-        onRetryClick = viewModel::loadRecipes,
-        onRecipeClick = onRecipeClick
+        onRetryClick = viewModel::loadRecipes
     )
 }
 
 @Composable
-private fun RecipesScreenContent(
+fun RecipesContent(
     uiState: RecipesUiState,
+    onRecipeClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
-    onRetryClick: () -> Unit,
-    onRecipeClick: (Int) -> Unit
+    onRetryClick: () -> Unit = {}
 ) {
     Column(
         modifier = modifier.fillMaxSize()
@@ -77,7 +78,9 @@ private fun RecipesScreenContent(
                         .weight(1f),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator()
+                    CircularProgressIndicator(
+                        modifier = Modifier.testTag("loading_indicator")
+                    )
                 }
             }
 
@@ -95,6 +98,7 @@ private fun RecipesScreenContent(
                     ) {
                         Text(
                             text = uiState.errorMessage,
+                            modifier = Modifier.testTag("error_message"),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.error
                         )
@@ -145,7 +149,7 @@ private fun EmptyRecipesContent(
     modifier: Modifier = Modifier
 ) {
     Box(
-        modifier = modifier,
+        modifier = modifier.testTag("empty_state"),
         contentAlignment = Alignment.Center
     ) {
         Surface(
@@ -170,7 +174,7 @@ private fun EmptyRecipesContent(
 @Composable
 private fun RecipesScreenPreview() {
     RecipesAppTheme {
-        RecipesScreenContent(
+        RecipesContent(
             uiState = RecipesUiState(
                 categoryTitle = "Бургеры",
                 categoryImageUrl = "",
