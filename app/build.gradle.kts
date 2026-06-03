@@ -93,4 +93,11 @@ dependencies {
     testImplementation(libs.mockk)
     testImplementation(libs.coroutines.test)
     testImplementation(libs.turbine)
+    androidTestImplementation(libs.room.testing)
+    androidTestImplementation(libs.hilt.android.testing)
+    androidTestImplementation(libs.mockwebserver)
+    androidTestImplementation(libs.coroutines.test)
+    androidTestImplementation(libs.turbine)
+
+    kspAndroidTest(libs.hiltCompiler)
 }
