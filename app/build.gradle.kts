@@ -100,4 +100,8 @@ dependencies {
     androidTestImplementation(libs.turbine)
 
     kspAndroidTest(libs.hiltCompiler)
+    androidTestImplementation(libs.kaspresso)
+    androidTestImplementation(libs.kaspresso.compose)
+    androidTestImplementation(libs.androidx.test.runner)
+    androidTestImplementation(libs.androidx.test.rules)
 }

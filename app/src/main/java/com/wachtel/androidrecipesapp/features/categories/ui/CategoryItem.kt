@@ -1,6 +1,5 @@
 package com.wachtel.androidrecipesapp.features.categories.ui
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,11 +13,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import com.wachtel.androidrecipesapp.core.ui.RecipeImage
 import com.wachtel.androidrecipesapp.features.categories.presentation.model.CategoryUiModel
 import com.wachtel.androidrecipesapp.ui.theme.Dimens
-import com.wachtel.androidrecipesapp.core.ui.RecipeImage
 
 @Composable
 fun CategoryItem(
@@ -27,9 +27,10 @@ fun CategoryItem(
     modifier: Modifier = Modifier
 ) {
     Card(
+        onClick = onClick,
         modifier = modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick),
+            .testTag("category_item"),
         shape = RoundedCornerShape(Dimens.CornerLarge),
         elevation = CardDefaults.cardElevation(
             defaultElevation = Dimens.CardElevation

@@ -45,7 +45,7 @@ fun RecipesScreen(
     RecipesContent(
         uiState = uiState,
         onRecipeClick = onRecipeClick,
-        modifier = modifier,
+        modifier = modifier.testTag("recipes_screen"),
         onRetryClick = viewModel::loadRecipes
     )
 }
