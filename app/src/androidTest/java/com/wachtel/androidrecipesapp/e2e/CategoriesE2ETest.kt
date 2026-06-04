@@ -1,4 +1,4 @@
-package com.wachtel.androidrecipesapp.features.categories.ui
+package com.wachtel.androidrecipesapp.e2e
 
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -6,11 +6,12 @@ import com.kaspersky.components.composesupport.config.withComposeSupport
 import com.kaspersky.kaspresso.kaspresso.Kaspresso
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
 import com.wachtel.androidrecipesapp.MainActivity
-import com.wachtel.androidrecipesapp.features.recipes.ui.RecipesComposeScreen
+import com.wachtel.androidrecipesapp.screen.CategoriesComposeScreen
+import com.wachtel.androidrecipesapp.screen.RecipesComposeScreen
+import io.github.kakaocup.compose.node.element.ComposeScreen
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import io.github.kakaocup.compose.node.element.ComposeScreen.Companion.onComposeScreen
 
 @RunWith(AndroidJUnit4::class)
 class CategoriesE2ETest : TestCase(
@@ -23,7 +24,7 @@ class CategoriesE2ETest : TestCase(
     @Test
     fun categoriesScreenLoadsContent() = run {
         step("Открыть приложение и проверить экран категорий") {
-            onComposeScreen<CategoriesComposeScreen>(composeTestRule) {
+            ComposeScreen.Companion.onComposeScreen<CategoriesComposeScreen>(composeTestRule) {
                 categoriesGrid {
                     assertIsDisplayed()
                 }
@@ -34,7 +35,7 @@ class CategoriesE2ETest : TestCase(
     @Test
     fun clickingCategoryOpensRecipesScreen() = run {
         step("Дождаться загрузки категорий") {
-            onComposeScreen<CategoriesComposeScreen>(composeTestRule) {
+            ComposeScreen.Companion.onComposeScreen<CategoriesComposeScreen>(composeTestRule) {
                 categoriesGrid {
                     assertIsDisplayed()
                 }
@@ -42,7 +43,7 @@ class CategoriesE2ETest : TestCase(
         }
 
         step("Нажать на первую категорию") {
-            onComposeScreen<CategoriesComposeScreen>(composeTestRule) {
+            ComposeScreen.Companion.onComposeScreen<CategoriesComposeScreen>(composeTestRule) {
                 categoryItem {
                     performClick()
                 }
@@ -50,7 +51,7 @@ class CategoriesE2ETest : TestCase(
         }
 
         step("Проверить что открылся экран рецептов") {
-            onComposeScreen<RecipesComposeScreen>(composeTestRule) {
+            ComposeScreen.Companion.onComposeScreen<RecipesComposeScreen>(composeTestRule) {
                 assertIsDisplayed()
             }
         }

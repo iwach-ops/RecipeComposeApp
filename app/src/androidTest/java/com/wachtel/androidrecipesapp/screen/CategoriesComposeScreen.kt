@@ -1,4 +1,4 @@
-package com.wachtel.androidrecipesapp.features.categories.ui
+package com.wachtel.androidrecipesapp.screen
 
 import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
 import io.github.kakaocup.compose.node.element.ComposeScreen
