@@ -42,11 +42,10 @@ fun CategoriesScreen(
     CategoriesContent(
         uiState = uiState,
         onCategoryClick = onCategoryClick,
-        modifier = modifier,
+        modifier = modifier.testTag("categories_screen"),
         onRetryClick = viewModel::loadCategories
     )
 }
-
 @Composable
 fun CategoriesContent(
     uiState: CategoriesUiState,
@@ -108,15 +107,16 @@ fun CategoriesContent(
                     columns = GridCells.Fixed(2),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(1f),
+                        .weight(1f)
+                        .testTag("categories_grid"),
                     contentPadding = PaddingValues(Dimens.Space16),
                     horizontalArrangement = Arrangement.spacedBy(Dimens.Space12),
                     verticalArrangement = Arrangement.spacedBy(Dimens.Space12)
                 ) {
                     items(
                         items = uiState.categories,
-                        key = { it.id }
-                    ) { category ->
+                        key = { category: CategoryUiModel -> category.id }
+                    ) { category: CategoryUiModel ->
                         CategoryItem(
                             category = category,
                             onClick = {
